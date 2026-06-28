@@ -1,26 +1,143 @@
 @import "tailwindcss";
 
+/*
+ * FluxIcons design token system.
+ * Raw HSL channel values live on :root / .dark as plain CSS variables.
+ * They are mapped into Tailwind color utilities via @theme inline below,
+ * so e.g. `bg-background`, `text-foreground-muted`, `border-border` work.
+ */
+
+/* next-themes uses attribute="class", so dark mode is class-driven. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Background */
+  --background: 0 0% 100%;
+  --background-subtle: 0 0% 97%;
+  --background-muted: 0 0% 94%;
+
+  /* Foreground */
+  --foreground: 0 0% 4%;
+  --foreground-muted: 0 0% 40%;
+  --foreground-subtle: 0 0% 60%;
+
+  /* Border */
+  --border: 0 0% 89%;
+  --border-strong: 0 0% 78%;
+
+  /* Brand */
+  --brand: 239 84% 67%; /* Indigo #6366F1 */
+  --brand-foreground: 0 0% 100%;
+
+  /* Semantic */
+  --radius: 8px;
+  --radius-sm: 6px;
+  --radius-lg: 12px;
+}
+
+.dark {
+  --background: 0 0% 4%;
+  --background-subtle: 0 0% 7%;
+  --background-muted: 0 0% 11%;
+  --foreground: 0 0% 98%;
+  --foreground-muted: 0 0% 63%;
+  --foreground-subtle: 0 0% 45%;
+  --border: 0 0% 15%;
+  --border-strong: 0 0% 24%;
+  --brand: 239 84% 67%;
+  --brand-foreground: 0 0% 100%;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: hsl(var(--background));
+  --color-background-subtle: hsl(var(--background-subtle));
+  --color-background-muted: hsl(var(--background-muted));
+
+  --color-foreground: hsl(var(--foreground));
+  --color-foreground-muted: hsl(var(--foreground-muted));
+  --color-foreground-subtle: hsl(var(--foreground-subtle));
+
+  --color-border: hsl(var(--border));
+  --color-border-strong: hsl(var(--border-strong));
+
+  --color-brand: hsl(var(--brand));
+  --color-brand-foreground: hsl(var(--brand-foreground));
+
+  --radius-sm: var(--radius-sm);
+  --radius-DEFAULT: var(--radius);
+  --radius-lg: var(--radius-lg);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+    font-feature-settings: "ss01", "cv01";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: hsl(var(--foreground));
+    color: hsl(var(--background));
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  /* Aggressive negative tracking for display type (Vercel voice). */
+  .tracking-display {
+    letter-spacing: -0.04em;
+  }
+  .tracking-display-tight {
+    letter-spacing: -0.05em;
+  }
+
+  /* Subtle stacked-shadow elevation, never a single heavy drop. */
+  .shadow-card {
+    box-shadow:
+      0 1px 1px hsl(0 0% 0% / 0.02),
+      0 2px 2px hsl(0 0% 0% / 0.04),
+      0 0 0 1px hsl(var(--border) / 0.6);
+  }
+  .shadow-float {
+    box-shadow:
+      0 2px 2px hsl(0 0% 0% / 0.04),
+      0 8px 16px -4px hsl(0 0% 0% / 0.06),
+      0 0 0 1px hsl(var(--border) / 0.6);
+  }
+
+  /* Checkerboard backdrop for the playground preview surface. */
+  .bg-checkerboard {
+    background-image:
+      linear-gradient(45deg, hsl(var(--background-muted)) 25%, transparent 25%),
+      linear-gradient(-45deg, hsl(var(--background-muted)) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, hsl(var(--background-muted)) 75%),
+      linear-gradient(-45deg, transparent 75%, hsl(var(--background-muted)) 75%);
+    background-size: 16px 16px;
+    background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+  }
+}
+
+/* Respect users who prefer reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

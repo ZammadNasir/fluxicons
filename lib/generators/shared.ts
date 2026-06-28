@@ -1,0 +1,158 @@
+import type {
+  AnimationSpec,
+  AnimationStep,
+  EasingName,
+  Origin,
+  PathData,
+} from "@/lib/animation-spec";
+import { roundTo, toPascalCase } from "@/lib/utils";
+
+/** PascalCase component name from a slug, e.g. "arrow-right" → "ArrowRight". */
+export function componentName(slug: string): string {
+  return toPascalCase(slug);
+}
+
+/** snake_case from a slug, e.g. "arrow-right" → "arrow_right" (Flutter files). */
+export function snakeCase(slug: string): string {
+  return slug.replace(/-+/g, "_").toLowerCase();
+}
+
+/** The center of a 0–24 viewBox; used when a step omits its origin. */
+export const DEFAULT_ORIGIN: Origin = { x: 12, y: 12 };
+
+/** Resolve a step's keyframe values, normalizing from/to into an array. */
+export function stepValues(step: AnimationStep): number[] {
+  if (step.values && step.values.length > 0) return step.values;
+  return [step.from ?? 0, step.to ?? 0];
+}
+
+/** Even keyframe stops across `count` values, e.g. 5 → [0, 25, 50, 75, 100]. */
+export function distributePercentages(count: number): number[] {
+  if (count <= 1) return [0];
+  return Array.from({ length: count }, (_, i) =>
+    roundTo((i / (count - 1)) * 100, 2),
+  );
+}
+
+/** All steps across every sequence in a spec, in a stable order. */
+export function allSteps(spec: AnimationSpec): AnimationStep[] {
+  return [
+    ...(spec.sequences.trigger ?? []),
+    ...(spec.sequences.continuous ?? []),
+    ...(spec.sequences.mount ?? []),
+  ];
+}
+
+/** Steps that play on interaction/mount (everything except `continuous`). */
+export function activeSteps(spec: AnimationSpec): AnimationStep[] {
+  return [...(spec.sequences.trigger ?? []), ...(spec.sequences.mount ?? [])];
+}
+
+/** Whether a spec animates continuously (e.g. Loader). */
+export function isContinuous(spec: AnimationSpec): boolean {
+  return (spec.sequences.continuous?.length ?? 0) > 0;
+}
+
+/** CSS `animation-timing-function` value for a named easing. */
+export function cssEasing(ease: EasingName): string {
+  switch (ease) {
+    case "linear":
+      return "linear";
+    case "easeIn":
+      return "ease-in";
+    case "easeOut":
+      return "ease-out";
+    case "easeInOut":
+      return "ease-in-out";
+    case "spring":
+      // A gentle overshoot approximating a spring settle.
+      return "cubic-bezier(0.34, 1.56, 0.64, 1)";
+    case "bounce":
+      return "cubic-bezier(0.22, 1.2, 0.36, 1)";
+  }
+}
+
+/** react-native-reanimated `Easing` expression for a named easing. */
+export function reanimatedEasing(ease: EasingName): string {
+  switch (ease) {
+    case "linear":
+      return "Easing.linear";
+    case "easeIn":
+      return "Easing.in(Easing.ease)";
+    case "easeOut":
+      return "Easing.out(Easing.ease)";
+    case "easeInOut":
+      return "Easing.inOut(Easing.ease)";
+    case "spring":
+      return "Easing.out(Easing.back(2))";
+    case "bounce":
+      return "Easing.bounce";
+  }
+}
+
+/** Flutter `Curves` member for a named easing. */
+export function flutterCurve(ease: EasingName): string {
+  switch (ease) {
+    case "linear":
+      return "Curves.linear";
+    case "easeIn":
+      return "Curves.easeIn";
+    case "easeOut":
+      return "Curves.easeOut";
+    case "easeInOut":
+      return "Curves.easeInOut";
+    case "spring":
+      return "Curves.elasticOut";
+    case "bounce":
+      return "Curves.bounceOut";
+  }
+}
+
+/** Framer Motion `ease` token for a named easing (cubic array for springs). */
+export function framerEasing(ease: EasingName): string {
+  switch (ease) {
+    case "spring":
+    case "bounce":
+      return `[0.34, 1.56, 0.64, 1]`;
+    case "easeIn":
+      return `"easeIn"`;
+    case "easeOut":
+      return `"easeOut"`;
+    case "easeInOut":
+      return `"easeInOut"`;
+    case "linear":
+      return `"linear"`;
+  }
+}
+
+/** A Flutter `Color` literal from a hex/keyword, e.g. "#6366F1" → 0xFF6366F1. */
+export function flutterColor(color: string): string {
+  const hex = color.replace("#", "").trim();
+  if (/^[0-9a-fA-F]{6}$/.test(hex)) {
+    return `const Color(0xFF${hex.toUpperCase()})`;
+  }
+  if (/^[0-9a-fA-F]{8}$/.test(hex)) {
+    return `const Color(0x${hex.toUpperCase()})`;
+  }
+  // Named CSS color or "currentColor" — fall back to a sensible default.
+  return "Colors.black";
+}
+
+/** Render a {@link PathData} as an SVG element string (lowercase JSX/HTML). */
+export function renderSvgElement(
+  data: PathData,
+  attrs: string,
+  selfClose = true,
+): string {
+  const end = selfClose ? " />" : ">";
+  switch (data.type) {
+    case "path":
+      return `<path${attrs} d="${data.d}"${end}`;
+    case "circle":
+      return `<circle${attrs} cx="${data.cx}" cy="${data.cy}" r="${data.r}"${end}`;
+    case "line":
+      return `<line${attrs} x1="${data.x1}" y1="${data.y1}" x2="${data.x2}" y2="${data.y2}"${end}`;
+    case "polyline":
+      return `<polyline${attrs} points="${data.points}"${end}`;
+  }
+}
