@@ -18,16 +18,6 @@ const FRAMEWORKS: Framework[] = [
     glyph: "V",
     description: "Script setup components with CSS keyframe animations.",
   },
-  {
-    name: "React Native",
-    glyph: "▽",
-    description: "Reanimated components for iOS and Android.",
-  },
-  {
-    name: "Flutter",
-    glyph: "◇",
-    description: "AnimationController widgets. Pure Dart, no packages.",
-  },
 ];
 
 export function FrameworksSection() {

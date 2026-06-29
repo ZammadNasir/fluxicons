@@ -26,8 +26,8 @@ export interface GeneratorOutput {
 }
 
 /**
- * Contract every framework generator implements (React today; Vue and
- * React Native are planned and must satisfy this same interface).
+ * Contract every framework generator implements (React and Vue today; future
+ * frameworks must satisfy this same interface).
  */
 export interface GeneratorInterface {
   /** Stable id, e.g. "react" or "next". */
@@ -85,11 +85,11 @@ export interface GeneratedFile {
  * the CLI writes into a user's project.
  */
 export interface IconGenerator {
-  /** Stable id, e.g. "react" | "vue" | "react-native" | "flutter". */
+  /** Stable id, e.g. "react" | "vue". */
   readonly framework: string;
-  /** Human label, e.g. "React" | "Vue 3" | "React Native" | "Flutter". */
+  /** Human label, e.g. "React" | "Vue 3". */
   readonly displayName: string;
-  /** File extension for the generated artifact, e.g. "tsx" | "vue" | "dart". */
+  /** File extension for the generated artifact, e.g. "tsx" | "vue". */
   readonly fileExtension: string;
 
   generate(

@@ -6,8 +6,7 @@
  *
  * Act as the end-user `npx fluxicons add` command — generate a native
  * component for a framework from an existing icon's spec:
- *   npm run create-icon -- Bell --framework vue
- *   npm run create-icon -- Bell --framework flutter --out lib/icons
+ *   npm run create-icon -- Bell --framework vue --out components/icons
  */
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -38,10 +37,6 @@ function toSlug(input: string): string {
 function toCamelCase(slug: string): string {
   const p = toPascalCase(slug);
   return p.charAt(0).toLowerCase() + p.slice(1);
-}
-
-function toSnakeCase(slug: string): string {
-  return slug.replace(/-+/g, "_").toLowerCase();
 }
 
 /* -------------------------------- logging --------------------------------- */
@@ -83,7 +78,7 @@ for (let i = 0; i < argv.length; i++) {
 
 const rawName = positional[0];
 if (!rawName) {
-  fail("Usage: npm run create-icon -- <Name> [--framework <vue|react|react-native|flutter>]");
+  fail("Usage: npm run create-icon -- <Name> [--framework <react|vue>]");
 }
 
 const name = toPascalCase(rawName);
@@ -110,9 +105,8 @@ if (framework) {
 
   const output = generator.generate(source!.spec, source!.paths, meta!);
 
-  const isFlutter = framework === "flutter";
-  const fileBase = isFlutter ? `${toSnakeCase(slug)}_icon` : name;
-  const dir = outDir ?? (isFlutter ? "lib/icons" : "components/icons");
+  const fileBase = name;
+  const dir = outDir ?? "components/icons";
   const outPath = join(process.cwd(), dir, `${fileBase}.${output.fileExtension}`);
 
   write(outPath, output.code);

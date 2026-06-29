@@ -83,13 +83,11 @@ export default function DocsPage() {
             Every icon is authored once as a framework-agnostic spec, then
             generated natively for your stack. Pass{" "}
             <code className="font-mono text-foreground">--framework</code> to
-            target Vue, React Native, or Flutter:
+            target Vue:
           </p>
           <CodeBlock
             language="bash"
-            code={`npx fluxicons add clock --framework vue
-npx fluxicons add clock --framework react-native
-npx fluxicons add clock --framework flutter`}
+            code={`npx fluxicons add clock --framework vue`}
           />
         </Section>
 
@@ -103,8 +101,8 @@ export function Example() {
 }`}
           />
           <p>
-            Using Vue, React Native, or Flutter? The same props apply across
-            every framework — grab the exact snippet from the matching tab in the{" "}
+            Using Vue? The same props apply across every framework — grab the
+            exact snippet from the matching tab in the{" "}
             <Link href="/playground" className="text-brand hover:underline">
               playground
             </Link>

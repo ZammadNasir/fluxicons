@@ -12,11 +12,6 @@ export function componentName(slug: string): string {
   return toPascalCase(slug);
 }
 
-/** snake_case from a slug, e.g. "arrow-right" → "arrow_right" (Flutter files). */
-export function snakeCase(slug: string): string {
-  return slug.replace(/-+/g, "_").toLowerCase();
-}
-
 /** The center of a 0–24 viewBox; used when a step omits its origin. */
 export const DEFAULT_ORIGIN: Origin = { x: 12, y: 12 };
 
@@ -72,42 +67,6 @@ export function cssEasing(ease: EasingName): string {
   }
 }
 
-/** react-native-reanimated `Easing` expression for a named easing. */
-export function reanimatedEasing(ease: EasingName): string {
-  switch (ease) {
-    case "linear":
-      return "Easing.linear";
-    case "easeIn":
-      return "Easing.in(Easing.ease)";
-    case "easeOut":
-      return "Easing.out(Easing.ease)";
-    case "easeInOut":
-      return "Easing.inOut(Easing.ease)";
-    case "spring":
-      return "Easing.out(Easing.back(2))";
-    case "bounce":
-      return "Easing.bounce";
-  }
-}
-
-/** Flutter `Curves` member for a named easing. */
-export function flutterCurve(ease: EasingName): string {
-  switch (ease) {
-    case "linear":
-      return "Curves.linear";
-    case "easeIn":
-      return "Curves.easeIn";
-    case "easeOut":
-      return "Curves.easeOut";
-    case "easeInOut":
-      return "Curves.easeInOut";
-    case "spring":
-      return "Curves.elasticOut";
-    case "bounce":
-      return "Curves.bounceOut";
-  }
-}
-
 /** Framer Motion `ease` token for a named easing (cubic array for springs). */
 export function framerEasing(ease: EasingName): string {
   switch (ease) {
@@ -123,19 +82,6 @@ export function framerEasing(ease: EasingName): string {
     case "linear":
       return `"linear"`;
   }
-}
-
-/** A Flutter `Color` literal from a hex/keyword, e.g. "#6366F1" → 0xFF6366F1. */
-export function flutterColor(color: string): string {
-  const hex = color.replace("#", "").trim();
-  if (/^[0-9a-fA-F]{6}$/.test(hex)) {
-    return `const Color(0xFF${hex.toUpperCase()})`;
-  }
-  if (/^[0-9a-fA-F]{8}$/.test(hex)) {
-    return `const Color(0x${hex.toUpperCase()})`;
-  }
-  // Named CSS color or "currentColor" — fall back to a sensible default.
-  return "Colors.black";
 }
 
 /** Render a {@link PathData} as an SVG element string (lowercase JSX/HTML). */

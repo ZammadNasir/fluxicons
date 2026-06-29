@@ -23,6 +23,9 @@ import { metadata as loaderMeta } from "@/icons/loader/metadata";
 import { searchPaths } from "@/icons/search/paths";
 import searchSpec from "@/icons/search/animation.spec";
 import { metadata as searchMeta } from "@/icons/search/metadata";
+import { userPaths } from "@/icons/user/paths";
+import userSpec from "@/icons/user/animation.spec";
+import { metadata as userMeta } from "@/icons/user/metadata";
 
 /** Every icon's framework-agnostic source (pure data — no React). */
 export const ICON_SOURCES: Record<string, IconSource> = {
@@ -33,4 +36,5 @@ export const ICON_SOURCES: Record<string, IconSource> = {
   "heart": { paths: heartPaths, spec: heartSpec, metadata: heartMeta },
   "loader": { paths: loaderPaths, spec: loaderSpec, metadata: loaderMeta },
   "search": { paths: searchPaths, spec: searchSpec, metadata: searchMeta },
+  "user": { paths: userPaths, spec: userSpec, metadata: userMeta },
 };

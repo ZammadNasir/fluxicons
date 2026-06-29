@@ -312,6 +312,46 @@ var metadata7 = {
   animationDescription: "The lens pulses, then the whole glass jiggles left-right once."
 };
 
+// icons/user/paths.ts
+var userPaths = {
+  shape: {
+    type: "path",
+    d: "M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 2c-5 0-9 2.5-9 6v2h18v-2c0-3.5-4-6-9-6Z"
+  }
+};
+
+// icons/user/animation.spec.ts
+var userSpec = {
+  elements: {
+    shape: { id: "user-shape", description: "TODO: describe this element" }
+  },
+  sequences: {
+    trigger: [
+      {
+        element: "shape",
+        property: "scale",
+        values: [1, 1.12, 1],
+        duration: 0.5,
+        ease: "easeInOut",
+        origin: { x: 12, y: 12 }
+      }
+    ]
+  },
+  defaultTrigger: "hover"
+};
+var animation_spec_default8 = userSpec;
+
+// icons/user/metadata.ts
+var metadata8 = {
+  name: "User",
+  slug: "user",
+  category: "Uncategorized",
+  tags: [],
+  featured: false,
+  description: "TODO: one-line description for User.",
+  animationDescription: "TODO: describe what the animation does."
+};
+
 // lib/icon-sources.generated.ts
 var ICON_SOURCES = {
   "bell": { paths: bellPaths, spec: animation_spec_default, metadata },
@@ -320,7 +360,8 @@ var ICON_SOURCES = {
   "download": { paths: downloadPaths, spec: animation_spec_default4, metadata: metadata4 },
   "heart": { paths: heartPaths, spec: animation_spec_default5, metadata: metadata5 },
   "loader": { paths: loaderPaths, spec: animation_spec_default6, metadata: metadata6 },
-  "search": { paths: searchPaths, spec: animation_spec_default7, metadata: metadata7 }
+  "search": { paths: searchPaths, spec: animation_spec_default7, metadata: metadata7 },
+  "user": { paths: userPaths, spec: animation_spec_default8, metadata: metadata8 }
 };
 
 // lib/icon-sources.ts
@@ -359,9 +400,6 @@ var DEFAULT_IMPORT_PATH = "@/components/icons";
 function componentName(slug) {
   return toPascalCase(slug);
 }
-function snakeCase(slug) {
-  return slug.replace(/-+/g, "_").toLowerCase();
-}
 var DEFAULT_ORIGIN = { x: 12, y: 12 };
 function stepValues(step) {
   if (step.values && step.values.length > 0) return step.values;
@@ -393,38 +431,6 @@ function cssEasing(ease) {
       return "cubic-bezier(0.22, 1.2, 0.36, 1)";
   }
 }
-function reanimatedEasing(ease) {
-  switch (ease) {
-    case "linear":
-      return "Easing.linear";
-    case "easeIn":
-      return "Easing.in(Easing.ease)";
-    case "easeOut":
-      return "Easing.out(Easing.ease)";
-    case "easeInOut":
-      return "Easing.inOut(Easing.ease)";
-    case "spring":
-      return "Easing.out(Easing.back(2))";
-    case "bounce":
-      return "Easing.bounce";
-  }
-}
-function flutterCurve(ease) {
-  switch (ease) {
-    case "linear":
-      return "Curves.linear";
-    case "easeIn":
-      return "Curves.easeIn";
-    case "easeOut":
-      return "Curves.easeOut";
-    case "easeInOut":
-      return "Curves.easeInOut";
-    case "spring":
-      return "Curves.elasticOut";
-    case "bounce":
-      return "Curves.bounceOut";
-  }
-}
 function framerEasing(ease) {
   switch (ease) {
     case "spring":
@@ -439,16 +445,6 @@ function framerEasing(ease) {
     case "linear":
       return `"linear"`;
   }
-}
-function flutterColor(color) {
-  const hex = color.replace("#", "").trim();
-  if (/^[0-9a-fA-F]{6}$/.test(hex)) {
-    return `const Color(0xFF${hex.toUpperCase()})`;
-  }
-  if (/^[0-9a-fA-F]{8}$/.test(hex)) {
-    return `const Color(0x${hex.toUpperCase()})`;
-  }
-  return "Colors.black";
 }
 function renderSvgElement(data, attrs, selfClose = true) {
   const end = selfClose ? " />" : ">";
@@ -782,707 +778,17 @@ onMounted(() => {
   }
 };
 
-// lib/generators/react-native.ts
-function mapTrigger(trigger) {
-  if (trigger === "autoplay" || trigger === "inView") return "autoplay";
-  if (trigger === "none") return "none";
-  return "press";
-}
-var RN_PROP = {
-  rotate: "rotation",
-  scale: "scale",
-  translateX: "translateX",
-  translateY: "translateY",
-  opacity: "opacity",
-  pathLength: "strokeDashoffset"
-};
-var RN_DASH = 48;
-function sharedName(elementKey, property) {
-  const el = elementKey.replace(/[^a-zA-Z0-9]/g, "");
-  return `${el}${property.charAt(0).toUpperCase()}${property.slice(1)}`;
-}
-function buildDriver(step) {
-  const values = stepValues(step);
-  const easing = reanimatedEasing(step.ease);
-  const segments = values.slice(1).map(
-    (v) => `withTiming(${v}, { duration: (${step.duration} / speed) * 1000 / ${values.length - 1}, easing: ${easing} })`
-  );
-  let expr = segments.length === 1 ? segments[0] : `withSequence(
-      ${segments.join(",\n      ")},
-    )`;
-  if (step.repeat) expr = `withRepeat(${expr}, -1)`;
-  if (step.delay && step.delay > 0) {
-    expr = `withDelay((${step.delay} / speed) * 1000, ${expr})`;
-  }
-  return expr;
-}
-function svgTag(data, attrs) {
-  switch (data.type) {
-    case "path":
-      return `Path${attrs} d="${data.d}"`;
-    case "circle":
-      return `Circle${attrs} cx={${data.cx}} cy={${data.cy}} r={${data.r}}`;
-    case "line":
-      return `Line${attrs} x1={${data.x1}} y1={${data.y1}} x2={${data.x2}} y2={${data.y2}}`;
-    case "polyline":
-      return `Polyline${attrs} points="${data.points}"`;
-  }
-}
-function buildRnElement(elementKey, paths, spec) {
-  const data = paths[elementKey];
-  const steps = [
-    ...spec.sequences.trigger ?? [],
-    ...spec.sequences.continuous ?? []
-  ].filter((s) => s.element === elementKey);
-  const stroke = ` stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" fill="none"`;
-  if (steps.length === 0) {
-    return {
-      markup: `        <${svgTag(data, stroke)} />`,
-      shared: [],
-      animatedProps: [],
-      drivers: [],
-      animated: false
-    };
-  }
-  const shared = [];
-  const drivers = [];
-  const propEntries = [];
-  let origin = DEFAULT_ORIGIN;
-  let dash = "";
-  for (const step of steps) {
-    const sv = sharedName(elementKey, step.property);
-    const initial = stepValues(step)[0];
-    shared.push(`  const ${sv} = useSharedValue(${initial});`);
-    drivers.push(`    ${sv}.value = ${buildDriver(step)};`);
-    const rnProp = RN_PROP[step.property];
-    propEntries.push(`${rnProp}: ${sv}.value`);
-    if (step.origin) origin = step.origin;
-    if (step.property === "pathLength") dash = ` strokeDasharray={${RN_DASH}}`;
-  }
-  const apName = `${elementKey.replace(/[^a-zA-Z0-9]/g, "")}Props`;
-  const animatedProps = [
-    `  const ${apName} = useAnimatedProps(() => ({ ${propEntries.join(", ")} }));`
-  ];
-  const isDraw = steps.some((s) => s.property === "pathLength");
-  if (isDraw && data.type === "path") {
-    return {
-      markup: `        <AnimatedPath animatedProps={${apName}}${stroke}${dash} d="${data.d}" />`,
-      shared,
-      animatedProps,
-      drivers,
-      animated: true
-    };
-  }
-  const originAttrs = ` originX={${origin.x}} originY={${origin.y}}`;
-  return {
-    markup: `        <AnimatedG animatedProps={${apName}}${originAttrs}>
-          <${svgTag(data, stroke)} />
-        </AnimatedG>`,
-    shared,
-    animatedProps,
-    drivers,
-    animated: true
-  };
-}
-var reactNativeGenerator = {
-  framework: "react-native",
-  displayName: "React Native",
-  fileExtension: "tsx",
-  generate(spec, paths, meta, config) {
-    const name = componentName(meta.slug);
-    const p = config?.props ?? {};
-    const size = p.size ?? DEFAULT_ICON_PROPS.size;
-    const color = p.color && p.color !== "currentColor" ? p.color : "#000000";
-    const strokeWidth = p.strokeWidth ?? DEFAULT_ICON_PROPS.strokeWidth;
-    const trigger = mapTrigger(p.trigger ?? spec.defaultTrigger);
-    const speed = p.speed ?? DEFAULT_ICON_PROPS.speed;
-    const continuous = isContinuous(spec);
-    const elements = Object.keys(paths).map(
-      (key) => buildRnElement(key, paths, spec)
-    );
-    const usedTags = /* @__PURE__ */ new Set();
-    for (const key of Object.keys(paths)) {
-      const t = paths[key].type;
-      usedTags.add(t.charAt(0).toUpperCase() + t.slice(1));
-    }
-    const shared = elements.flatMap((e) => e.shared);
-    const animatedProps = elements.flatMap((e) => e.animatedProps);
-    const drivers = elements.flatMap((e) => e.drivers);
-    const markup = elements.map((e) => e.markup).join("\n");
-    const usesG = markup.includes("AnimatedG");
-    const usesPath = markup.includes("AnimatedPath");
-    const needsG = usesG && !usedTags.has("G");
-    const namedImports = [...Array.from(usedTags), needsG ? "G" : null].filter(
-      Boolean
-    );
-    const svgImports = namedImports.join(", ");
-    const animatedDecls = [
-      usesG ? `const AnimatedG = Animated.createAnimatedComponent(G);` : null,
-      usesPath ? `const AnimatedPath = Animated.createAnimatedComponent(Path);` : null
-    ].filter(Boolean);
-    const autoStart = continuous || trigger === "autoplay";
-    const playEffect = autoStart ? `
-  useEffect(() => {
-    play();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-` : "";
-    const code = `import React${autoStart ? ", { useEffect }" : ""} from 'react';
-import { Pressable } from 'react-native';
-import Svg, { ${svgImports} } from 'react-native-svg';
-import Animated, {
-  useSharedValue,
-  useAnimatedProps,
-  withTiming,
-  withSequence,
-  withRepeat,
-  withDelay,
-  Easing,
-} from 'react-native-reanimated';
-
-${animatedDecls.join("\n")}
-
-interface ${name}Props {
-  size?: number;
-  color?: string;
-  strokeWidth?: number;
-  trigger?: 'press' | 'autoplay' | 'none';
-  speed?: number;
-}
-
-export default function ${name}({
-  size = ${size},
-  color = '${color}',
-  strokeWidth = ${strokeWidth},
-  trigger = '${trigger}',
-  speed = ${speed},
-}: ${name}Props) {
-${shared.join("\n")}
-
-${animatedProps.join("\n")}
-
-  function play() {
-${drivers.join("\n")}
-  }
-${playEffect}
-  return (
-    <Pressable onPress={() => trigger === 'press' && play()}>
-      <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-${markup}
-      </Svg>
-    </Pressable>
-  );
-}
-`;
-    const importStatement = `import ${name} from './components/icons/${name}';`;
-    const usageSnippet = `<${name} size={32} />`;
-    return {
-      code,
-      fileExtension: "tsx",
-      importStatement,
-      usageSnippet,
-      dependencies: "npm install react-native-reanimated react-native-svg"
-    };
-  }
-};
-
-// lib/generators/flutter-path-parser.ts
-var ARG_COUNT = {
-  M: 2,
-  L: 2,
-  H: 1,
-  V: 1,
-  C: 6,
-  S: 4,
-  Q: 4,
-  T: 2,
-  A: 7,
-  Z: 0
-};
-function parseCommands(d) {
-  const out = [];
-  const n = d.length;
-  let i = 0;
-  const isCmd = (c) => /[a-zA-Z]/.test(c);
-  const skipSep = () => {
-    while (i < n && /[\s,]/.test(d[i])) i++;
-  };
-  const readNumber = () => {
-    skipSep();
-    const start = i;
-    if (d[i] === "+" || d[i] === "-") i++;
-    while (i < n && /[0-9]/.test(d[i])) i++;
-    if (d[i] === ".") {
-      i++;
-      while (i < n && /[0-9]/.test(d[i])) i++;
-    }
-    if (d[i] === "e" || d[i] === "E") {
-      i++;
-      if (d[i] === "+" || d[i] === "-") i++;
-      while (i < n && /[0-9]/.test(d[i])) i++;
-    }
-    return parseFloat(d.slice(start, i));
-  };
-  const readFlag = () => {
-    skipSep();
-    const c = d[i];
-    i++;
-    return c === "1" ? 1 : 0;
-  };
-  let lastCmd = "";
-  while (i < n) {
-    skipSep();
-    if (i >= n) break;
-    let cmd;
-    if (isCmd(d[i])) {
-      cmd = d[i];
-      i++;
-    } else {
-      if (!lastCmd) break;
-      cmd = lastCmd === "M" ? "L" : lastCmd === "m" ? "l" : lastCmd;
-    }
-    const up = cmd.toUpperCase();
-    if (up === "Z") {
-      out.push({ cmd, args: [] });
-    } else if (up === "A") {
-      const rx = readNumber();
-      const ry = readNumber();
-      const rot = readNumber();
-      const large = readFlag();
-      const sweep = readFlag();
-      const x = readNumber();
-      const y = readNumber();
-      out.push({ cmd, args: [rx, ry, rot, large, sweep, x, y] });
-    } else {
-      const args = [];
-      for (let k = 0; k < ARG_COUNT[up]; k++) args.push(readNumber());
-      out.push({ cmd, args });
-    }
-    lastCmd = cmd;
-  }
-  return out;
-}
-function f(value) {
-  return Number.isInteger(value) ? String(value) : String(roundTo(value, 4));
-}
-function svgPathToFlutter(d, pathVar = "path") {
-  const commands = parseCommands(d);
-  const out = [];
-  let cx = 0;
-  let cy = 0;
-  let sx = 0;
-  let sy = 0;
-  let prevCtrlX = 0;
-  let prevCtrlY = 0;
-  let prevUp = "";
-  for (const { cmd, args } of commands) {
-    const rel2 = cmd === cmd.toLowerCase() && cmd !== cmd.toUpperCase();
-    const up = cmd.toUpperCase();
-    switch (up) {
-      case "M": {
-        let [x, y] = args;
-        if (rel2) {
-          x += cx;
-          y += cy;
-        }
-        cx = x;
-        cy = y;
-        sx = x;
-        sy = y;
-        out.push(`${pathVar}.moveTo(${f(x)}, ${f(y)});`);
-        break;
-      }
-      case "L": {
-        let [x, y] = args;
-        if (rel2) {
-          x += cx;
-          y += cy;
-        }
-        cx = x;
-        cy = y;
-        out.push(`${pathVar}.lineTo(${f(x)}, ${f(y)});`);
-        break;
-      }
-      case "H": {
-        let x = args[0];
-        if (rel2) x += cx;
-        cx = x;
-        out.push(`${pathVar}.lineTo(${f(cx)}, ${f(cy)});`);
-        break;
-      }
-      case "V": {
-        let y = args[0];
-        if (rel2) y += cy;
-        cy = y;
-        out.push(`${pathVar}.lineTo(${f(cx)}, ${f(cy)});`);
-        break;
-      }
-      case "C": {
-        let [x1, y1, x2, y2, x, y] = args;
-        if (rel2) {
-          x1 += cx;
-          y1 += cy;
-          x2 += cx;
-          y2 += cy;
-          x += cx;
-          y += cy;
-        }
-        out.push(
-          `${pathVar}.cubicTo(${f(x1)}, ${f(y1)}, ${f(x2)}, ${f(y2)}, ${f(x)}, ${f(y)});`
-        );
-        prevCtrlX = x2;
-        prevCtrlY = y2;
-        cx = x;
-        cy = y;
-        break;
-      }
-      case "S": {
-        let [x2, y2, x, y] = args;
-        if (rel2) {
-          x2 += cx;
-          y2 += cy;
-          x += cx;
-          y += cy;
-        }
-        const reflect = prevUp === "C" || prevUp === "S";
-        const x1 = reflect ? 2 * cx - prevCtrlX : cx;
-        const y1 = reflect ? 2 * cy - prevCtrlY : cy;
-        out.push(
-          `${pathVar}.cubicTo(${f(x1)}, ${f(y1)}, ${f(x2)}, ${f(y2)}, ${f(x)}, ${f(y)});`
-        );
-        prevCtrlX = x2;
-        prevCtrlY = y2;
-        cx = x;
-        cy = y;
-        break;
-      }
-      case "Q": {
-        let [x1, y1, x, y] = args;
-        if (rel2) {
-          x1 += cx;
-          y1 += cy;
-          x += cx;
-          y += cy;
-        }
-        out.push(
-          `${pathVar}.quadraticBezierTo(${f(x1)}, ${f(y1)}, ${f(x)}, ${f(y)});`
-        );
-        prevCtrlX = x1;
-        prevCtrlY = y1;
-        cx = x;
-        cy = y;
-        break;
-      }
-      case "T": {
-        let [x, y] = args;
-        if (rel2) {
-          x += cx;
-          y += cy;
-        }
-        const reflect = prevUp === "Q" || prevUp === "T";
-        const x1 = reflect ? 2 * cx - prevCtrlX : cx;
-        const y1 = reflect ? 2 * cy - prevCtrlY : cy;
-        out.push(
-          `${pathVar}.quadraticBezierTo(${f(x1)}, ${f(y1)}, ${f(x)}, ${f(y)});`
-        );
-        prevCtrlX = x1;
-        prevCtrlY = y1;
-        cx = x;
-        cy = y;
-        break;
-      }
-      case "A": {
-        const [rx, ry, rot, large, sweep] = args;
-        let x = args[5];
-        let y = args[6];
-        if (rel2) {
-          x += cx;
-          y += cy;
-        }
-        const rad = rot * Math.PI / 180;
-        out.push(
-          `${pathVar}.arcToPoint(Offset(${f(x)}, ${f(y)}), radius: Radius.elliptical(${f(rx)}, ${f(ry)}), rotation: ${f(rad)}, largeArc: ${large ? "true" : "false"}, clockwise: ${sweep ? "true" : "false"});`
-        );
-        cx = x;
-        cy = y;
-        break;
-      }
-      case "Z": {
-        out.push(`${pathVar}.close();`);
-        cx = sx;
-        cy = sy;
-        break;
-      }
-    }
-    prevUp = up;
-  }
-  return out;
-}
-
-// lib/generators/flutter.ts
-function num(value) {
-  return Number.isInteger(value) ? `${value}.0` : String(value);
-}
-function fieldName(elementKey, property) {
-  const el = elementKey.replace(/[^a-zA-Z0-9]/g, "");
-  return `${el}${property.charAt(0).toUpperCase()}${property.slice(1)}`;
-}
-function buildAnimationInit(field, step, totalDuration) {
-  const values = stepValues(step);
-  const items = values.length === 2 ? `      TweenSequenceItem(tween: Tween(begin: ${num(values[0])}, end: ${num(values[1])}), weight: 1),` : values.slice(1).map(
-    (v, i) => `      TweenSequenceItem(tween: Tween(begin: ${num(values[i])}, end: ${num(v)}), weight: 1),`
-  ).join("\n");
-  const delay = step.delay ?? 0;
-  const start = totalDuration > 0 ? delay / totalDuration : 0;
-  const end = totalDuration > 0 ? (delay + step.duration) / totalDuration : 1;
-  const curve = start <= 0 && end >= 1 ? flutterCurve(step.ease) : `Interval(${round4(start)}, ${round4(end)}, curve: ${flutterCurve(step.ease)})`;
-  return `    _${field} = TweenSequence<double>([
-${items}
-    ]).animate(CurvedAnimation(parent: _controller, curve: ${curve}));`;
-}
-function round4(n) {
-  return String(Math.round(n * 1e4) / 1e4);
-}
-function buildPainterElement(elementKey, data, spec) {
-  const steps = [
-    ...spec.sequences.trigger ?? [],
-    ...spec.sequences.continuous ?? []
-  ].filter((s) => s.element === elementKey);
-  const transforms = steps.filter(
-    (s) => ["rotate", "scale", "translateX", "translateY"].includes(s.property)
-  );
-  const opacityStep = steps.find((s) => s.property === "opacity");
-  const drawStep = steps.find((s) => s.property === "pathLength");
-  const origin = transforms.find((s) => s.origin)?.origin ?? DEFAULT_ORIGIN;
-  let paintVar = "paint";
-  const lines = [];
-  if (opacityStep) {
-    paintVar = `${elementKey}Paint`;
-    const field = fieldName(elementKey, "opacity");
-    lines.push(
-      `    final ${paintVar} = Paint()
-      ..color = color.withOpacity(${field})
-      ..strokeWidth = strokeWidth
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;`
-    );
-  }
-  const hasTransform = transforms.length > 0;
-  if (hasTransform) {
-    lines.push("    canvas.save();");
-    lines.push(`    canvas.translate(${num(origin.x)}, ${num(origin.y)});`);
-    for (const t of transforms) {
-      const field = fieldName(elementKey, t.property);
-      if (t.property === "rotate") {
-        lines.push(`    canvas.rotate(${field} * math.pi / 180);`);
-      } else if (t.property === "scale") {
-        lines.push(`    canvas.scale(${field});`);
-      }
-    }
-    lines.push(`    canvas.translate(${num(-origin.x)}, ${num(-origin.y)});`);
-    for (const t of transforms) {
-      const field = fieldName(elementKey, t.property);
-      if (t.property === "translateX") {
-        lines.push(`    canvas.translate(${field}, 0);`);
-      } else if (t.property === "translateY") {
-        lines.push(`    canvas.translate(0, ${field});`);
-      }
-    }
-  }
-  lines.push(...drawShape(elementKey, data, paintVar, drawStep));
-  if (hasTransform) lines.push("    canvas.restore();");
-  return lines.join("\n");
-}
-function drawShape(elementKey, data, paintVar, drawStep) {
-  if (data.type === "path") {
-    const pathVar2 = `${elementKey}Path`;
-    const stmts2 = svgPathToFlutter(data.d, pathVar2).map((s) => `    ${s}`);
-    const decl = [`    final ${pathVar2} = Path();`, ...stmts2];
-    if (drawStep) {
-      const field = fieldName(elementKey, "pathLength");
-      decl.push(
-        `    for (final metric in ${pathVar2}.computeMetrics()) {`,
-        `      canvas.drawPath(metric.extractPath(0, metric.length * ${field}), ${paintVar});`,
-        "    }"
-      );
-    } else {
-      decl.push(`    canvas.drawPath(${pathVar2}, ${paintVar});`);
-    }
-    return decl;
-  }
-  if (data.type === "circle") {
-    return [
-      `    canvas.drawCircle(Offset(${num(data.cx)}, ${num(data.cy)}), ${num(data.r)}, ${paintVar});`
-    ];
-  }
-  if (data.type === "line") {
-    return [
-      `    canvas.drawLine(Offset(${num(data.x1)}, ${num(data.y1)}), Offset(${num(data.x2)}, ${num(data.y2)}), ${paintVar});`
-    ];
-  }
-  const pathVar = `${elementKey}Path`;
-  const pts = data.points.trim().split(/\s+/).map((pair) => pair.split(",").map(Number));
-  const stmts = pts.map(
-    ([x, y], i) => i === 0 ? `    ${pathVar}.moveTo(${num(x)}, ${num(y)});` : `    ${pathVar}.lineTo(${num(x)}, ${num(y)});`
-  );
-  return [
-    `    final ${pathVar} = Path();`,
-    ...stmts,
-    `    canvas.drawPath(${pathVar}, ${paintVar});`
-  ];
-}
-var flutterGenerator = {
-  framework: "flutter",
-  displayName: "Flutter",
-  fileExtension: "dart",
-  generate(spec, paths, meta, config) {
-    const name = `${componentName(meta.slug)}Icon`;
-    const state = `_${name}State`;
-    const painter = `_${componentName(meta.slug)}Painter`;
-    const p = config?.props ?? {};
-    const size = p.size ?? DEFAULT_ICON_PROPS.size;
-    const colorLiteral = p.color && p.color !== "currentColor" ? flutterColor(p.color) : "Colors.black";
-    const strokeWidth = p.strokeWidth ?? DEFAULT_ICON_PROPS.strokeWidth;
-    const continuous = isContinuous(spec);
-    const animSteps = [
-      ...spec.sequences.trigger ?? [],
-      ...spec.sequences.continuous ?? []
-    ];
-    const totalDuration = Math.max(
-      1e-4,
-      ...animSteps.map((s) => (s.delay ?? 0) + s.duration)
-    );
-    const totalMs = Math.round(totalDuration * 1e3);
-    const fields = animSteps.map((s) => fieldName(s.element, s.property));
-    const fieldDecls = fields.map((fld) => `  late Animation<double> _${fld};`).join("\n");
-    const inits = animSteps.map((s) => buildAnimationInit(fieldName(s.element, s.property), s, totalDuration)).join("\n");
-    const repeatOrIdle = continuous ? "    _controller.repeat();" : "    // Call _play() (e.g. on tap) to run the animation.";
-    const painterFieldDecls = fields.map((fld) => `  final double ${fld};`).join("\n");
-    const painterCtorArgs = ["color", "strokeWidth", ...fields].map((a) => `    required this.${a},`).join("\n");
-    const painterCallArgs = [
-      "              color: widget.color,",
-      "              strokeWidth: widget.strokeWidth,",
-      ...fields.map((fld) => `              ${fld}: _${fld}.value,`)
-    ].join("\n");
-    const shouldRepaint = ["color", "strokeWidth", ...fields].map((a) => `old.${a} != ${a}`).join(" ||\n      ");
-    const painterBody = Object.keys(paths).map((key) => buildPainterElement(key, paths[key], spec)).join("\n\n");
-    const code = `import 'package:flutter/material.dart';
-import 'dart:math' as math;
-
-/// ${meta.name} \u2014 ${meta.animationDescription}
-class ${name} extends StatefulWidget {
-  final double size;
-  final Color color;
-  final double strokeWidth;
-  final double speed;
-
-  const ${name}({
-    super.key,
-    this.size = ${num(size)},
-    this.color = ${colorLiteral},
-    this.strokeWidth = ${num(strokeWidth)},
-    this.speed = 1.0,
-  });
-
-  @override
-  State<${name}> createState() => ${state}();
-}
-
-class ${state} extends State<${name}> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-${fieldDecls}
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: (${totalMs} / widget.speed).round()),
-    );
-${inits}
-${repeatOrIdle}
-  }
-
-  void _play() => _controller.forward(from: 0);
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: _play,
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          return CustomPaint(
-            size: Size(widget.size, widget.size),
-            painter: ${painter}(
-${painterCallArgs}
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class ${painter} extends CustomPainter {
-  final Color color;
-  final double strokeWidth;
-${painterFieldDecls}
-
-  ${painter}({
-${painterCtorArgs}
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = strokeWidth
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-
-    canvas.scale(size.width / 24.0);
-
-${painterBody}
-  }
-
-  @override
-  bool shouldRepaint(${painter} old) =>
-      ${shouldRepaint};
-}
-`;
-    const file = snakeCase(meta.slug);
-    return {
-      code,
-      fileExtension: "dart",
-      importStatement: `import 'icons/${file}_icon.dart';`,
-      usageSnippet: `${name}()`,
-      dependencies: "none \u2014 uses Flutter AnimationController"
-    };
-  }
-};
-
 // lib/generators/index.ts
 var ICON_GENERATORS = {
   react: reactGenerator,
-  vue: vueGenerator,
-  "react-native": reactNativeGenerator,
-  flutter: flutterGenerator
+  vue: vueGenerator
 };
 function getIconGenerator(framework) {
   return ICON_GENERATORS[framework];
 }
 
 // cli/index.ts
-var VERSION = true ? "0.1.0-beta.2" : "0.0.0";
+var VERSION = true ? "0.1.0-beta.3" : "0.0.0";
 var supportsColor = process.stdout.isTTY && process.env.NO_COLOR === void 0;
 var paint = (code, s) => supportsColor ? `\x1B[${code}m${s}\x1B[0m` : s;
 var green = (s) => paint("32", s);
@@ -1503,20 +809,13 @@ function resolveFramework(input) {
     "next.js": "react",
     nextjs: "react",
     vue: "vue",
-    vue3: "vue",
-    "react-native": "react-native",
-    "react native": "react-native",
-    reactnative: "react-native",
-    rn: "react-native",
-    flutter: "flutter",
-    dart: "flutter"
+    vue3: "vue"
   };
   return aliases[key];
 }
-function outputPath(slug, framework, ext, outDir) {
-  const isFlutter = framework === "flutter";
-  const fileBase = isFlutter ? `${slug.replace(/-+/g, "_")}_icon` : toPascalCase(slug);
-  const dir = outDir ?? (isFlutter ? "lib/icons" : "components/icons");
+function outputPath(slug, ext, outDir) {
+  const fileBase = toPascalCase(slug);
+  const dir = outDir ?? "components/icons";
   return (0, import_node_path.join)(process.cwd(), dir, `${fileBase}.${ext}`);
 }
 function rel(absPath) {
@@ -1565,8 +864,8 @@ ${bold("Commands")}
   ${cyan("list")}            List every available icon
 
 ${bold("Options")}
-  ${cyan("-f, --framework")}   react | vue | react-native | flutter ${dim("(default: react)")}
-  ${cyan("-o, --out")}         Output directory ${dim("(default: components/icons, or lib/icons for Flutter)")}
+  ${cyan("-f, --framework")}   react | vue ${dim("(default: react)")}
+  ${cyan("-o, --out")}         Output directory ${dim("(default: components/icons)")}
   ${cyan("    --force")}       Overwrite existing files
   ${cyan("-h, --help")}        Show this help
   ${cyan("-v, --version")}     Show the version
@@ -1574,7 +873,6 @@ ${bold("Options")}
 ${bold("Examples")}
   ${dim("$")} npx @zammadnasir/fluxicons add bell
   ${dim("$")} npx @zammadnasir/fluxicons add clock heart --framework vue
-  ${dim("$")} npx @zammadnasir/fluxicons add bell --framework flutter
   ${dim("$")} npx @zammadnasir/fluxicons add download --out src/icons
 `);
 }
@@ -1611,7 +909,7 @@ function add(args) {
       continue;
     }
     const output = generator.generate(source.spec, source.paths, source.metadata);
-    const dest = outputPath(slug, args.framework, output.fileExtension, args.outDir);
+    const dest = outputPath(slug, output.fileExtension, args.outDir);
     if ((0, import_node_fs.existsSync)(dest) && !args.force) {
       console.log(
         yellow(`\u2022 Skipped ${rel(dest)}`) + dim(" (already exists \u2014 use --force to overwrite)")

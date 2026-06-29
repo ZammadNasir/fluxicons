@@ -1,6 +1,6 @@
 {
   "name": "@zammadnasir/fluxicons",
-  "version": "0.1.0-beta.2",
+  "version": "0.1.0-beta.3",
   "private": false,
   "description": "Animated icons for every framework",
   "main": "dist/index.js",
@@ -14,8 +14,7 @@
     "icons",
     "animated",
     "react",
-    "vue",
-    "flutter"
+    "vue"
   ],
   "author": "Zammad Nasir",
   "license": "MIT",

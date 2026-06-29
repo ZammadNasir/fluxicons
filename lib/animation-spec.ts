@@ -6,7 +6,7 @@ import type { AnimationTrigger } from "@/lib/icon-registry";
  * An `AnimationSpec` describes *intent* — what moves, by how much, over how
  * long — without referencing any framework's animation API. Generators read a
  * spec (plus the icon's {@link IconPaths}) and emit native code for React,
- * Vue, React Native, Flutter, etc.
+ * Vue, etc.
  */
 
 /** A property that a generator knows how to animate. */

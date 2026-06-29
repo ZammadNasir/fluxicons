@@ -44,7 +44,7 @@ const FEATURES: Feature[] = [
   {
     icon: Boxes,
     title: "Framework Agnostic",
-    description: "React, Next.js, Vue, React Native, and Flutter — from one spec.",
+    description: "React, Next.js, and Vue — from one spec.",
   },
 ];
 

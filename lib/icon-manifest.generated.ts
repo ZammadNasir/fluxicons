@@ -10,6 +10,7 @@ import { metadata as downloadMeta } from "@/icons/download/metadata";
 import { metadata as heartMeta } from "@/icons/heart/metadata";
 import { metadata as loaderMeta } from "@/icons/loader/metadata";
 import { metadata as searchMeta } from "@/icons/search/metadata";
+import { metadata as userMeta } from "@/icons/user/metadata";
 
 /** Metadata for every icon, keyed by slug. */
 export const ICON_METADATA: Record<string, IconMetadata> = {
@@ -20,6 +21,7 @@ export const ICON_METADATA: Record<string, IconMetadata> = {
   "heart": heartMeta,
   "loader": loaderMeta,
   "search": searchMeta,
+  "user": userMeta,
 };
 
 /** Lazy component loaders keyed by slug (one chunk per icon). */
@@ -34,4 +36,5 @@ export const ICON_IMPORTS: Record<
   "heart": () => import("@/icons/heart"),
   "loader": () => import("@/icons/loader"),
   "search": () => import("@/icons/search"),
+  "user": () => import("@/icons/user"),
 };

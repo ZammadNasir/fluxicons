@@ -43,21 +43,14 @@ function resolveFramework(input: string): string | undefined {
     nextjs: "react",
     vue: "vue",
     vue3: "vue",
-    "react-native": "react-native",
-    "react native": "react-native",
-    reactnative: "react-native",
-    rn: "react-native",
-    flutter: "flutter",
-    dart: "flutter",
   };
   return aliases[key];
 }
 
 /** Default output location for a generated file in the user's project. */
-function outputPath(slug: string, framework: string, ext: string, outDir?: string): string {
-  const isFlutter = framework === "flutter";
-  const fileBase = isFlutter ? `${slug.replace(/-+/g, "_")}_icon` : toPascalCase(slug);
-  const dir = outDir ?? (isFlutter ? "lib/icons" : "components/icons");
+function outputPath(slug: string, ext: string, outDir?: string): string {
+  const fileBase = toPascalCase(slug);
+  const dir = outDir ?? "components/icons";
   return join(process.cwd(), dir, `${fileBase}.${ext}`);
 }
 
@@ -126,8 +119,8 @@ ${bold("Commands")}
   ${cyan("list")}            List every available icon
 
 ${bold("Options")}
-  ${cyan("-f, --framework")}   react | vue | react-native | flutter ${dim("(default: react)")}
-  ${cyan("-o, --out")}         Output directory ${dim("(default: components/icons, or lib/icons for Flutter)")}
+  ${cyan("-f, --framework")}   react | vue ${dim("(default: react)")}
+  ${cyan("-o, --out")}         Output directory ${dim("(default: components/icons)")}
   ${cyan("    --force")}       Overwrite existing files
   ${cyan("-h, --help")}        Show this help
   ${cyan("-v, --version")}     Show the version
@@ -135,7 +128,6 @@ ${bold("Options")}
 ${bold("Examples")}
   ${dim("$")} npx @zammadnasir/fluxicons add bell
   ${dim("$")} npx @zammadnasir/fluxicons add clock heart --framework vue
-  ${dim("$")} npx @zammadnasir/fluxicons add bell --framework flutter
   ${dim("$")} npx @zammadnasir/fluxicons add download --out src/icons
 `);
 }
@@ -177,7 +169,7 @@ function add(args: Args): void {
     }
 
     const output = generator!.generate(source.spec, source.paths, source.metadata);
-    const dest = outputPath(slug, args.framework, output.fileExtension, args.outDir);
+    const dest = outputPath(slug, output.fileExtension, args.outDir);
 
     if (existsSync(dest) && !args.force) {
       console.log(

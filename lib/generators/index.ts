@@ -1,8 +1,6 @@
 import type { GeneratorInterface, IconGenerator } from "./types";
 import { reactUsage, reactGenerator } from "./react";
 import { vueUsage, vueGenerator } from "./vue";
-import { reactNativeUsage, reactNativeGenerator } from "./react-native";
-import { flutterUsage, flutterGenerator } from "./flutter";
 
 /**
  * Usage-snippet generators powering the playground code panel, in tab order.
@@ -11,8 +9,6 @@ import { flutterUsage, flutterGenerator } from "./flutter";
 export const GENERATORS: GeneratorInterface[] = [
   reactUsage,
   vueUsage,
-  reactNativeUsage,
-  flutterUsage,
 ];
 
 /**
@@ -23,8 +19,6 @@ export const GENERATORS: GeneratorInterface[] = [
 export const ICON_GENERATORS: Record<string, IconGenerator> = {
   react: reactGenerator,
   vue: vueGenerator,
-  "react-native": reactNativeGenerator,
-  flutter: flutterGenerator,
 };
 
 /** Resolve a full-source generator by framework name. */
@@ -42,9 +36,3 @@ export type {
 } from "./types";
 export { generateReactCode, reactUsage, reactGenerator } from "./react";
 export { generateVueCode, vueUsage, vueGenerator } from "./vue";
-export {
-  generateReactNativeCode,
-  reactNativeUsage,
-  reactNativeGenerator,
-} from "./react-native";
-export { generateFlutterCode, flutterUsage, flutterGenerator } from "./flutter";
