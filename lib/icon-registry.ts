@@ -1,12 +1,6 @@
 import type React from "react";
 
-import { metadata as clock } from "@/icons/clock/metadata";
-import { metadata as heart } from "@/icons/heart/metadata";
-import { metadata as bell } from "@/icons/bell/metadata";
-import { metadata as check } from "@/icons/check/metadata";
-import { metadata as search } from "@/icons/search/metadata";
-import { metadata as loader } from "@/icons/loader/metadata";
-import { metadata as download } from "@/icons/download/metadata";
+import { ICON_METADATA, ICON_IMPORTS } from "./icon-manifest.generated";
 
 /**
  * What event starts an icon's animation.
@@ -72,36 +66,12 @@ export interface IconMetadata {
 }
 
 /**
- * Static registry of all icon metadata, keyed by slug.
- * This and `ICON_IMPORTS` are the ONLY places icons are referenced by name —
- * all consuming code goes through the typed utilities below.
+ * Static registry of all icon metadata, keyed by slug. Both this and
+ * `ICON_IMPORTS` are generated from the filesystem by
+ * `scripts/generate-registry.ts` — add an icon folder and rebuild; no manual
+ * edits here. All consuming code goes through the typed utilities below.
  */
-export const ICON_REGISTRY: Record<string, IconMetadata> = {
-  clock,
-  heart,
-  bell,
-  check,
-  search,
-  loader,
-  download,
-};
-
-/**
- * Lazy component loaders keyed by slug. Each icon is split into its own chunk
- * so consumers never bundle the whole library at once.
- */
-const ICON_IMPORTS: Record<
-  string,
-  () => Promise<{ default: React.ComponentType<IconProps> }>
-> = {
-  clock: () => import("@/icons/clock"),
-  heart: () => import("@/icons/heart"),
-  bell: () => import("@/icons/bell"),
-  check: () => import("@/icons/check"),
-  search: () => import("@/icons/search"),
-  loader: () => import("@/icons/loader"),
-  download: () => import("@/icons/download"),
-};
+export const ICON_REGISTRY: Record<string, IconMetadata> = ICON_METADATA;
 
 /** Every icon's metadata, sorted alphabetically by name. */
 export function getAllIcons(): IconMetadata[] {

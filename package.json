@@ -1,29 +1,43 @@
 {
-  "name": "fluxicons",
-   "version": "0.1.0-beta.1",
-  "private": true,
+  "name": "@zammadnasir/fluxicons",
+  "version": "0.1.0-beta.2",
+  "private": false,
   "description": "Animated icons for every framework",
   "main": "dist/index.js",
   "bin": {
-    "fluxicons": "./dist/cli/index.js"
+    "fluxicons": "dist/cli/index.js"
   },
   "files": [
     "dist"
   ],
-  "keywords": ["icons", "animated", "react", "vue", "flutter"],
+  "keywords": [
+    "icons",
+    "animated",
+    "react",
+    "vue",
+    "flutter"
+  ],
   "author": "Zammad Nasir",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/zammad-nasir/fluxicons"
+    "url": "git+https://github.com/ZammadNasir/fluxicons.git"
   },
   "scripts": {
+    "generate": "tsx scripts/generate-registry.ts",
+    "predev": "npm run generate",
     "dev": "next dev",
+    "prebuild": "npm run generate",
     "build": "next build",
+    "build:cli": "tsx scripts/build-cli.ts",
     "start": "next start",
     "lint": "eslint",
     "type-check": "tsc --noEmit",
-    "create-icon": "tsx scripts/create-icon.ts"
+    "create-icon": "tsx scripts/create-icon.ts",
+    "prepublishOnly": "npm run build:cli"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -40,6 +54,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "esbuild": "^0.28.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
     "tailwindcss": "^4",

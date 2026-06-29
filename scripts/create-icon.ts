@@ -285,5 +285,6 @@ console.log(green(`✓ Created icons/${slug}/index.ts`));
 console.log("\nNext:");
 console.log(`  1. Define real geometry in icons/${slug}/paths.ts`);
 console.log(`  2. Design the animation in icons/${slug}/animation.spec.ts + ${name}.tsx`);
-console.log("  3. Register the icon in lib/icon-registry.ts and lib/icon-sources.ts");
+console.log("  3. Run `npm run generate` — the icon is auto-registered for the");
+console.log("     website and the CLI (no manual registry edits needed).");
 console.log(`  4. Generate for any framework: npm run create-icon -- ${name} --framework vue`);

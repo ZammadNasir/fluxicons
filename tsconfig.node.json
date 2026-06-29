@@ -3,17 +3,28 @@
     "target": "ES2020",
     "module": "CommonJS",
     "moduleResolution": "node",
-    "esModuleInterop": true,
+    "outDir": "./dist",
+    "rootDir": "./",
     "strict": true,
+    "esModuleInterop": true,
     "skipLibCheck": true,
-    "noEmit": true,
-    "types": ["node"]
+    "resolveJsonModule": true,
+    "removeComments": false
   },
-  "ts-node": {
-    "transpileOnly": true,
-    "compilerOptions": {
-      "module": "CommonJS"
-    }
-  },
-  "include": ["scripts/**/*.ts"]
+  "include": [
+    "cli/**/*",
+    "scripts/**/*",
+    "lib/generators/**/*",
+    "lib/animation-spec.ts",
+    "lib/utils.ts",
+    "icons/*/paths.ts",
+    "icons/*/animation.spec.ts",
+    "icons/*/metadata.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "app/**/*",
+    "components/**/*",
+    ".next/**/*"
+  ]
 }
