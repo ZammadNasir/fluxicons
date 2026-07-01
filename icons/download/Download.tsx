@@ -50,6 +50,15 @@ const Download = forwardRef<SVGSVGElement, IconProps>(
           repeatDelay,
         },
       },
+      hold: {
+        y: [0, 4, -1, 2],
+        transition: {
+          duration: 0.6 / speed,
+          ease: EASE,
+          delay,
+          repeat: 0,
+        },
+      },
     };
 
     const baseline: Variants = {
@@ -62,6 +71,15 @@ const Download = forwardRef<SVGSVGElement, IconProps>(
           delay,
           repeat,
           repeatDelay,
+        },
+      },
+      hold: {
+        opacity: [1, 0.35, 0.8],
+        transition: {
+          duration: 0.6 / speed,
+          ease: EASE,
+          delay,
+          repeat: 0,
         },
       },
     };

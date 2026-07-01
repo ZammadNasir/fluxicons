@@ -10,6 +10,8 @@ type AnimationControls = ReturnType<typeof useAnimationControls>;
 export const REST = "normal" as const;
 /** Variant name for an icon's active/animated pose. */
 export const ACTIVE = "animate" as const;
+/** Variant name for an icon's hover-hold pose (ends at peak, not rest). */
+export const HOLD = "hold" as const;
 
 function assignRef<T>(ref: React.Ref<T> | undefined, value: T | null): void {
   if (typeof ref === "function") {
@@ -49,9 +51,9 @@ interface UseIconControls {
  * Shared trigger + accessibility plumbing for every FluxIcon.
  *
  * This intentionally contains NO animation definitions — each icon owns its
- * own variants (`normal`/`animate`) and timing. This hook only decides *when*
- * to move between those poses based on the `trigger`, and wires the correct
- * ARIA role / keyboard handling for interactive (`click`) icons.
+ * own variants (`normal`/`animate`/`hold`) and timing. This hook only decides
+ * *when* to move between those poses based on the `trigger`, and wires the
+ * correct ARIA role / keyboard handling for interactive (`click`) icons.
  */
 export function useIconControls(
   forwardedRef: React.Ref<SVGSVGElement> | undefined,
@@ -94,6 +96,16 @@ export function useIconControls(
     controls.start(REST).then(() => onAnimationComplete?.());
   }, [controls, onAnimationComplete]);
 
+  // Plays the hold variant (ends at peak) on hover — used by hoverHold trigger.
+  const holdEnter = useCallback(() => {
+    onAnimationStart?.();
+    controls.start(HOLD);
+  }, [controls, onAnimationStart]);
+
+  const holdLeave = useCallback(() => {
+    controls.start(REST).then(() => onAnimationComplete?.());
+  }, [controls, onAnimationComplete]);
+
   // autoplay: loop continuously from mount (loop handled in the icon's variant).
   useEffect(() => {
     if (trigger === "autoplay") {
@@ -120,6 +132,14 @@ export function useIconControls(
       onMouseLeave: leave,
       onFocus: enter,
       onBlur: leave,
+    };
+  } else if (trigger === "hoverHold") {
+    rootProps = {
+      role: "img",
+      onMouseEnter: holdEnter,
+      onMouseLeave: holdLeave,
+      onFocus: holdEnter,
+      onBlur: holdLeave,
     };
   } else if (trigger === "click") {
     rootProps = {

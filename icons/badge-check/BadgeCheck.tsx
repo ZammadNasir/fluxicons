@@ -54,6 +54,15 @@ const BadgeCheck = forwardRef<SVGSVGElement, IconProps>(
           repeat: loop ? Infinity : 0,
         },
       },
+      hold: {
+        rotateY: [0, 360],
+        transition: {
+          duration: 0.8 / speed,
+          ease: EASE,
+          delay,
+          repeat: 0,
+        },
+      },
     };
 
     const draw: Variants = {
@@ -65,6 +74,15 @@ const BadgeCheck = forwardRef<SVGSVGElement, IconProps>(
           ease: "easeOut",
           delay: delay + 0.3 / speed,
           repeat: loop ? Infinity : 0,
+        },
+      },
+      hold: {
+        pathLength: [0, 1],
+        transition: {
+          duration: 0.5 / speed,
+          ease: "easeOut",
+          delay: delay + 0.3 / speed,
+          repeat: 0,
         },
       },
     };

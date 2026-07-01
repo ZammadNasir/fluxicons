@@ -44,12 +44,20 @@ const Clock = forwardRef<SVGSVGElement, IconProps>(
         rotate: 360,
         transition: { duration: 2 / speed, ease: EASE, delay, repeat },
       },
+      hold: {
+        rotate: 360,
+        transition: { duration: 2 / speed, ease: EASE, delay, repeat: 0 },
+      },
     };
     const minuteHand: Variants = {
       normal: { rotate: 0 },
       animate: {
         rotate: 720,
         transition: { duration: 2 / speed, ease: EASE, delay, repeat },
+      },
+      hold: {
+        rotate: 720,
+        transition: { duration: 2 / speed, ease: EASE, delay, repeat: 0 },
       },
     };
 

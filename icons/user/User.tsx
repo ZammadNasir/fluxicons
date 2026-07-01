@@ -58,6 +58,16 @@ const User = forwardRef<SVGSVGElement, IconProps>(
           repeat: loop ? Infinity : 0,
         },
       },
+      hold: {
+        scale: [1, 1.08, 1.03],
+        rotate: [0, -3, 3, 1.5],
+        transition: {
+          duration: 0.6 / speed,
+          ease: EASE,
+          delay,
+          repeat: 0,
+        },
+      },
     };
 
     return (

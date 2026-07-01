@@ -50,6 +50,15 @@ const Bell = forwardRef<SVGSVGElement, IconProps>(
           repeatDelay: loop ? 0.5 / speed : 0,
         },
       },
+      hold: {
+        rotate: [0, -12, 12, -9, 9, -5],
+        transition: {
+          duration: 0.7 / speed,
+          ease: EASE,
+          delay,
+          repeat: 0,
+        },
+      },
     };
 
     return (

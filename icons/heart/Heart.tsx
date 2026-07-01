@@ -51,6 +51,16 @@ const Heart = forwardRef<SVGSVGElement, IconProps>(
           repeatDelay: loop ? 0.4 / speed : 0,
         },
       },
+      hold: {
+        scale: [1, 1.18, 0.96, 1.04],
+        strokeWidth: [strokeWidth, strokeWidth * 1.6, strokeWidth, strokeWidth * 1.2],
+        transition: {
+          duration: 0.6 / speed,
+          ease: EASE,
+          delay,
+          repeat: 0,
+        },
+      },
     };
 
     return (

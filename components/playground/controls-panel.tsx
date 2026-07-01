@@ -19,6 +19,7 @@ interface ControlsPanelProps {
 
 const TRIGGER_OPTIONS: { label: string; value: AnimationTrigger }[] = [
   { label: "Hover", value: "hover" },
+  { label: "Hover hold", value: "hoverHold" },
   { label: "Click", value: "click" },
   { label: "In view", value: "inView" },
   { label: "Auto", value: "autoplay" },

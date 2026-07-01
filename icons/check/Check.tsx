@@ -53,6 +53,19 @@ const Check = forwardRef<SVGSVGElement, IconProps>(
           opacity: { duration: 0.1 / speed, delay },
         },
       },
+      hold: {
+        pathLength: [0, 1],
+        opacity: [0, 1, 1],
+        transition: {
+          pathLength: {
+            duration: 0.5 / speed,
+            ease: EASE,
+            delay,
+            repeat: 0,
+          },
+          opacity: { duration: 0.1 / speed, delay },
+        },
+      },
     };
 
     return (

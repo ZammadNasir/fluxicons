@@ -41,6 +41,7 @@ const ExternalLink = forwardRef<SVGSVGElement, IconProps>(
     const box: Variants = {
       normal: {},
       animate: {},
+      hold: {},
     };
 
     const arrow: Variants = {
@@ -56,6 +57,16 @@ const ExternalLink = forwardRef<SVGSVGElement, IconProps>(
           ease: EASE,
           delay,
           repeat: loop ? Infinity : 0,
+        },
+      },
+      hold: {
+        x: [0, 1.5],
+        y: [0, -1.5],
+        transition: {
+          duration: 0.4 / speed,
+          ease: EASE,
+          delay,
+          repeat: 0,
         },
       },
     };

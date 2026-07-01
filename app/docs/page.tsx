@@ -23,6 +23,7 @@ const PROPS: { name: string; type: string; def: string; desc: string }[] = [
 
 const TRIGGERS: { value: string; desc: string }[] = [
   { value: "hover", desc: "Plays while the parent is hovered or focused." },
+  { value: "hoverHold", desc: "Plays on hover and holds the animated peak position; returns to rest on leave." },
   { value: "click", desc: "Plays once per click; keyboard accessible (Enter/Space)." },
   { value: "inView", desc: "Plays once when the icon scrolls into view." },
   { value: "autoplay", desc: "Loops continuously." },

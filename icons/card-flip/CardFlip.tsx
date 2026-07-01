@@ -53,6 +53,15 @@ const CardFlip = forwardRef<SVGSVGElement, IconProps>(
           repeat: loop ? Infinity : 0,
         },
       },
+      hold: {
+        rotateX: [0, 180, 360],
+        transition: {
+          duration: 0.7 / speed,
+          ease: EASE,
+          delay,
+          repeat: 0,
+        },
+      },
     };
 
     return (

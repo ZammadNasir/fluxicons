@@ -253,7 +253,7 @@ interface ${name}Props {
   size?: number;
   color?: string;
   strokeWidth?: number;
-  trigger?: "hover" | "click" | "inView" | "autoplay" | "none";
+  trigger?: "hover" | "hoverHold" | "click" | "inView" | "autoplay" | "none";
   speed?: number;
 }
 

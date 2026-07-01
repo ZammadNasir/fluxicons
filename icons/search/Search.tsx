@@ -51,6 +51,15 @@ const Search = forwardRef<SVGSVGElement, IconProps>(
           repeatDelay: repeatDelay + 0.25 / speed,
         },
       },
+      hold: {
+        x: [0, -2.5, 2.5, -1.5, 1.5, -1],
+        transition: {
+          duration: 0.5 / speed,
+          ease: EASE,
+          delay: delay + 0.2 / speed,
+          repeat: 0,
+        },
+      },
     };
 
     const lens: Variants = {
@@ -63,6 +72,15 @@ const Search = forwardRef<SVGSVGElement, IconProps>(
           delay,
           repeat,
           repeatDelay: repeatDelay + 0.45 / speed,
+        },
+      },
+      hold: {
+        scale: [1, 1.18, 1.05],
+        transition: {
+          duration: 0.3 / speed,
+          ease: EASE,
+          delay,
+          repeat: 0,
         },
       },
     };

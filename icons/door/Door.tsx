@@ -56,6 +56,16 @@ const Door = forwardRef<SVGSVGElement, IconProps>(
           repeat: loop ? Infinity : 0,
         },
       },
+      hold: {
+        rotateY: [0, -55],
+        scaleX: [1, 0.85],
+        transition: {
+          duration: 0.6 / speed,
+          ease: EASE,
+          delay,
+          repeat: 0,
+        },
+      },
     };
 
     return (

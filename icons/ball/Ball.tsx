@@ -54,6 +54,16 @@ const Ball = forwardRef<SVGSVGElement, IconProps>(
           repeat: loop ? Infinity : 0,
         },
       },
+      hold: {
+        scaleX: [1, 1.22, 0.96, 1.05],
+        scaleY: [1, 0.78, 1.08, 0.95],
+        transition: {
+          duration: 0.55 / speed,
+          ease: EASE,
+          delay,
+          repeat: 0,
+        },
+      },
     };
 
     return (

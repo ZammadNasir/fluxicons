@@ -5,6 +5,7 @@ import { ICON_METADATA, ICON_IMPORTS } from "./icon-manifest.generated";
 /**
  * What event starts an icon's animation.
  * - `hover`: plays while the parent is hovered
+ * - `hoverHold`: plays on hover and holds the animated peak position; returns to rest on leave
  * - `click`: plays once per click (and via keyboard when focusable)
  * - `inView`: plays once when the icon scrolls into view
  * - `autoplay`: loops continuously
@@ -12,6 +13,7 @@ import { ICON_METADATA, ICON_IMPORTS } from "./icon-manifest.generated";
  */
 export type AnimationTrigger =
   | "hover"
+  | "hoverHold"
   | "click"
   | "inView"
   | "autoplay"

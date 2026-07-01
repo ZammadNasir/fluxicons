@@ -29,6 +29,7 @@ export const PLAYGROUND_DEFAULTS: PlaygroundState = {
 
 const TRIGGERS: AnimationTrigger[] = [
   "hover",
+  "hoverHold",
   "click",
   "inView",
   "autoplay",
