@@ -17,7 +17,9 @@ import {
   DEFAULT_ORIGIN,
   framerEasing,
   isContinuous,
+  perspectiveFor,
   stepValues,
+  uses3DTransform,
 } from "./shared";
 
 /* -------------------------------------------------------------------------- */
@@ -101,7 +103,11 @@ export const reactUsage: GeneratorInterface = {
 /** Framer Motion property name for an animatable property. */
 const FRAMER_PROP: Record<string, string> = {
   rotate: "rotate",
+  rotateX: "rotateX",
+  rotateY: "rotateY",
   scale: "scale",
+  scaleX: "scaleX",
+  scaleY: "scaleY",
   translateX: "x",
   translateY: "y",
   opacity: "opacity",
@@ -109,7 +115,16 @@ const FRAMER_PROP: Record<string, string> = {
   strokeWidth: "strokeWidth",
 };
 
-const TRANSFORM_PROPS = new Set(["rotate", "scale", "translateX", "translateY"]);
+const TRANSFORM_PROPS = new Set([
+  "rotate",
+  "rotateX",
+  "rotateY",
+  "scale",
+  "scaleX",
+  "scaleY",
+  "translateX",
+  "translateY",
+]);
 
 /** The resting value for a property (drawn paths rest "complete"). */
 function restValue(step: AnimationStep): number {
@@ -204,6 +219,7 @@ export const reactGenerator: IconGenerator = {
     const trigger = p.trigger ?? spec.defaultTrigger;
     const speed = p.speed ?? DEFAULT_ICON_PROPS.speed;
     const continuous = isContinuous(spec);
+    const is3D = uses3DTransform(spec);
 
     const animSteps = [
       ...(spec.sequences.trigger ?? []),
@@ -224,6 +240,10 @@ export const reactGenerator: IconGenerator = {
     const animateExpr = autoActive
       ? '"active"'
       : 'trigger === "click" && clicked ? "active" : "rest"';
+    // 3D rotations need a perspective on the SVG root to render with depth.
+    const perspectiveStyle = is3D
+      ? `\n      style={{ perspective: "${perspectiveFor(spec)}px" }}`
+      : "";
     const code = `"use client";
 
 import { useState } from "react";
@@ -262,7 +282,7 @@ ${variantDecls.join("\n\n")}
       strokeLinecap="round"
       strokeLinejoin="round"
       role="img"
-      aria-label="${meta.name} icon"
+      aria-label="${meta.name} icon"${perspectiveStyle}
       initial="rest"
       animate={animateState}
       whileHover={trigger === "hover" ? "active" : undefined}

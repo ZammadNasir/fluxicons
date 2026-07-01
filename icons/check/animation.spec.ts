@@ -26,7 +26,7 @@ const checkSpec: AnimationSpec = {
       },
     ],
   },
-  defaultTrigger: "click",
+  defaultTrigger: "hover",
 };
 
 export default checkSpec;

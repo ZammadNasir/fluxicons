@@ -3,9 +3,13 @@
 import type { ComponentType } from "react";
 import type { IconMetadata, IconProps } from "@/lib/icon-registry";
 
+import { metadata as badgeCheckMeta } from "@/icons/badge-check/metadata";
+import { metadata as ballMeta } from "@/icons/ball/metadata";
 import { metadata as bellMeta } from "@/icons/bell/metadata";
+import { metadata as cardFlipMeta } from "@/icons/card-flip/metadata";
 import { metadata as checkMeta } from "@/icons/check/metadata";
 import { metadata as clockMeta } from "@/icons/clock/metadata";
+import { metadata as doorMeta } from "@/icons/door/metadata";
 import { metadata as downloadMeta } from "@/icons/download/metadata";
 import { metadata as heartMeta } from "@/icons/heart/metadata";
 import { metadata as loaderMeta } from "@/icons/loader/metadata";
@@ -14,9 +18,13 @@ import { metadata as userMeta } from "@/icons/user/metadata";
 
 /** Metadata for every icon, keyed by slug. */
 export const ICON_METADATA: Record<string, IconMetadata> = {
+  "badge-check": badgeCheckMeta,
+  "ball": ballMeta,
   "bell": bellMeta,
+  "card-flip": cardFlipMeta,
   "check": checkMeta,
   "clock": clockMeta,
+  "door": doorMeta,
   "download": downloadMeta,
   "heart": heartMeta,
   "loader": loaderMeta,
@@ -29,9 +37,13 @@ export const ICON_IMPORTS: Record<
   string,
   () => Promise<{ default: ComponentType<IconProps> }>
 > = {
+  "badge-check": () => import("@/icons/badge-check"),
+  "ball": () => import("@/icons/ball"),
   "bell": () => import("@/icons/bell"),
+  "card-flip": () => import("@/icons/card-flip"),
   "check": () => import("@/icons/check"),
   "clock": () => import("@/icons/clock"),
+  "door": () => import("@/icons/door"),
   "download": () => import("@/icons/download"),
   "heart": () => import("@/icons/heart"),
   "loader": () => import("@/icons/loader"),

@@ -17,8 +17,10 @@ import {
   DEFAULT_ORIGIN,
   distributePercentages,
   isContinuous,
+  perspectiveFor,
   renderSvgElement,
   stepValues,
+  uses3DTransform,
 } from "./shared";
 
 const DEFAULT_VUE_IMPORT_PATH = "@/components/icons";
@@ -48,6 +50,10 @@ function buildUsageAttributes(input: GeneratorInput): string[] {
     attrs.push(`trigger="${input.trigger}"`);
   }
   if (input.speed !== DEFAULT_ICON_PROPS.speed) attrs.push(`:speed="${input.speed}"`);
+  if (input.loop !== DEFAULT_ICON_PROPS.loop) {
+    attrs.push(input.loop ? "loop" : ':loop="false"');
+  }
+  if (input.delay !== DEFAULT_ICON_PROPS.delay) attrs.push(`:delay="${input.delay}"`);
   return attrs;
 }
 
@@ -85,7 +91,11 @@ export const vueUsage: GeneratorInterface = {
 
 const TRANSFORM_PROPS = new Set([
   "rotate",
+  "rotateX",
+  "rotateY",
   "scale",
+  "scaleX",
+  "scaleY",
   "translateX",
   "translateY",
 ]);
@@ -95,8 +105,16 @@ function cssFrameValue(step: AnimationStep, value: number): string {
   switch (step.property) {
     case "rotate":
       return `transform: rotate(${value}deg);`;
+    case "rotateX":
+      return `transform: rotateX(${value}deg);`;
+    case "rotateY":
+      return `transform: rotateY(${value}deg);`;
     case "scale":
       return `transform: scale(${value});`;
+    case "scaleX":
+      return `transform: scaleX(${value});`;
+    case "scaleY":
+      return `transform: scaleY(${value});`;
     case "translateX":
       return `transform: translateX(${value}px);`;
     case "translateY":
@@ -111,11 +129,15 @@ function cssFrameValue(step: AnimationStep, value: number): string {
   }
 }
 
-/** Emit the `@keyframes` block + class for a single animation step. */
+/**
+ * Emit the `@keyframes` block + class for a single animation step. Timing
+ * (duration, delay, iteration count) is bound inline via `stepStyle()` so the
+ * `speed`, `delay`, and `loop` props can drive it at runtime.
+ */
 function buildStepCss(
   step: AnimationStep,
   className: string,
-  continuous: boolean,
+  preserve3D: boolean,
 ): string {
   const values = stepValues(step);
   const percents = distributePercentages(values.length);
@@ -129,11 +151,13 @@ function buildStepCss(
   const lines = [
     isTransform ? "  transform-box: view-box;" : null,
     isTransform ? `  transform-origin: ${origin.x}px ${origin.y}px;` : null,
+    // Keep the 3D rendering context alive down the wrapper chain so the SVG
+    // root's perspective reaches nested 3D rotations.
+    isTransform && preserve3D ? "  transform-style: preserve-3d;" : null,
     isDraw ? "  stroke-dasharray: 1;" : null,
     `  animation-name: ${className};`,
     "  animation-fill-mode: forwards;",
     `  animation-timing-function: ${cssEasing(step.ease)};`,
-    continuous || step.repeat ? "  animation-iteration-count: infinite;" : null,
   ].filter(Boolean);
 
   const keyframes = `@keyframes ${className} {\n${frames}\n}`;
@@ -142,16 +166,12 @@ function buildStepCss(
 }
 
 /**
- * A `:style` binding that sets the step's duration/delay at runtime, dividing
- * by the live `speed` prop. Output (for duration 0.6, no delay):
- *   :style="`animation-duration: ${0.6 / speed}s`"
+ * A `:style` binding that calls the component's `stepStyle()` helper, passing
+ * the step's duration, its intrinsic delay, and whether it must loop regardless
+ * of the `loop` prop (continuous/repeating steps always loop).
  */
-function vueDurationBinding(step: AnimationStep): string {
-  const delay =
-    step.delay && step.delay > 0
-      ? `; animation-delay: \${${step.delay} / speed}s`
-      : "";
-  return `:style="\`animation-duration: \${${step.duration} / speed}s${delay}\`"`;
+function vueStepStyleBinding(step: AnimationStep, alwaysLoop: boolean): string {
+  return `:style="stepStyle(${step.duration}, ${step.delay ?? 0}, ${alwaysLoop})"`;
 }
 
 /** Render one element (with its animation wrappers) and collect its CSS. */
@@ -163,29 +183,38 @@ function renderVueElement(
 ): string {
   const data = paths[elementKey];
   const id = spec.elements[elementKey]?.id ?? elementKey;
-  const continuous = isContinuous(spec);
+  const preserve3D = uses3DTransform(spec);
 
+  // Tag each step with whether it must loop on its own: continuous-sequence
+  // steps and steps flagged `repeat` always loop; trigger steps loop only when
+  // the user passes `loop`.
   const steps = [
-    ...(spec.sequences.trigger ?? []),
-    ...(spec.sequences.continuous ?? []),
-  ].filter((s) => s.element === elementKey);
+    ...(spec.sequences.trigger ?? [])
+      .filter((s) => s.element === elementKey)
+      .map((step) => ({ step, alwaysLoop: Boolean(step.repeat) })),
+    ...(spec.sequences.continuous ?? [])
+      .filter((s) => s.element === elementKey)
+      .map((step) => ({ step, alwaysLoop: true })),
+  ];
 
   // pathLength draws on the path element itself via the stroke-dash trick.
-  const drawStep = steps.find((s) => s.property === "pathLength");
+  const draw = steps.find((s) => s.step.property === "pathLength");
   let shapeAttrs = ` id="${id}"`;
-  if (drawStep) {
+  if (draw) {
     const className = `flux-${id}-draw`;
-    cssBlocks.push(buildStepCss(drawStep, className, continuous));
-    shapeAttrs += ` pathLength="1" :class="{ '${className}': isAnimating }" ${vueDurationBinding(drawStep)}`;
+    cssBlocks.push(buildStepCss(draw.step, className, preserve3D));
+    shapeAttrs += ` pathLength="1" :class="{ '${className}': isAnimating }" ${vueStepStyleBinding(draw.step, draw.alwaysLoop)}`;
   }
 
   let markup = renderSvgElement(data, shapeAttrs);
 
   // Wrap transform/opacity steps in nested <g> so transforms compose.
-  for (const step of steps.filter((s) => s.property !== "pathLength")) {
+  for (const { step, alwaysLoop } of steps.filter(
+    (s) => s.step.property !== "pathLength",
+  )) {
     const className = `flux-${id}-${step.property.toLowerCase()}`;
-    cssBlocks.push(buildStepCss(step, className, continuous));
-    markup = `<g :class="{ '${className}': isAnimating }" ${vueDurationBinding(step)}>\n        ${markup.split("\n").join("\n        ")}\n      </g>`;
+    cssBlocks.push(buildStepCss(step, className, preserve3D));
+    markup = `<g :class="{ '${className}': isAnimating }" ${vueStepStyleBinding(step, alwaysLoop)}>\n        ${markup.split("\n").join("\n        ")}\n      </g>`;
   }
 
   return markup;
@@ -197,6 +226,8 @@ const VUE_PROPS_BLOCK = `interface Props {
   strokeWidth?: number
   trigger?:     'hover' | 'click' | 'inView' | 'autoplay' | 'none'
   speed?:       number
+  loop?:        boolean
+  delay?:       number
 }`;
 
 /** Full Vue 3 SFC generator: declarative spec → \`<script setup>\` + CSS. */
@@ -218,13 +249,20 @@ export const vueGenerator: IconGenerator = {
     const strokeWidth = p.strokeWidth ?? DEFAULT_ICON_PROPS.strokeWidth;
     const trigger = p.trigger ?? spec.defaultTrigger;
     const speed = p.speed ?? DEFAULT_ICON_PROPS.speed;
+    const loop = p.loop ?? DEFAULT_ICON_PROPS.loop;
+    const delay = p.delay ?? DEFAULT_ICON_PROPS.delay;
     const continuous = isContinuous(spec);
+    const is3D = uses3DTransform(spec);
 
     const cssBlocks: string[] = [];
     const body = Object.keys(paths)
       .map((key) => renderVueElement(key, paths, spec, cssBlocks))
       .join("\n      ");
 
+    // 3D rotations need a perspective on an ancestor to render with depth.
+    const perspectiveAttr = is3D
+      ? `\n    style="perspective: ${perspectiveFor(spec)}px"`
+      : "";
     const autoStart = continuous || trigger === "autoplay";
     const styleBlock =
       cssBlocks.length > 0
@@ -232,7 +270,7 @@ export const vueGenerator: IconGenerator = {
         : "";
 
     const code = `<script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 
 ${VUE_PROPS_BLOCK}
 
@@ -242,14 +280,35 @@ const props = withDefaults(defineProps<Props>(), {
   strokeWidth: ${strokeWidth},
   trigger:     '${trigger}',
   speed:       ${speed},
+  loop:        ${loop},
+  delay:       ${delay},
 })
 
+const rootRef = ref<SVGSVGElement | null>(null)
 const isAnimating = ref(${autoStart ? "true" : "false"})
 
+/**
+ * Inline timing for one animation step, reacting to the speed/delay/loop props.
+ * \`alwaysLoop\` is true for continuous/repeating steps that must loop no matter
+ * what the \`loop\` prop is.
+ */
+function stepStyle(duration: number, stepDelay: number, alwaysLoop: boolean) {
+  return {
+    animationDuration: \`\${duration / props.speed}s\`,
+    animationDelay: \`\${(stepDelay + props.delay) / props.speed}s\`,
+    animationIterationCount: alwaysLoop || props.loop ? 'infinite' : '1',
+  }
+}
+
 function play() {
+  // Restart the CSS animation: drop the class, let the browser paint at least
+  // one frame without it (a single rAF isn't enough — Vue's DOM flush and the
+  // re-add can coalesce into the same frame), then re-add it.
   isAnimating.value = false
   requestAnimationFrame(() => {
-    isAnimating.value = true
+    requestAnimationFrame(() => {
+      isAnimating.value = true
+    })
   })
 }
 
@@ -261,13 +320,31 @@ function handleEnter() {
   if (props.trigger === 'hover') play()
 }
 
+let observer: IntersectionObserver | null = null
+
 onMounted(() => {
   if (props.trigger === 'autoplay'${continuous ? " || true" : ""}) play()
+
+  if (props.trigger === 'inView' && rootRef.value) {
+    observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          play()
+          observer?.disconnect()
+        }
+      },
+      { threshold: 0.5 },
+    )
+    observer.observe(rootRef.value)
+  }
 })
+
+onUnmounted(() => observer?.disconnect())
 </script>
 
 <template>
   <svg
+    ref="rootRef"
     :width="size"
     :height="size"
     viewBox="0 0 24 24"
@@ -277,7 +354,7 @@ onMounted(() => {
     stroke-linecap="round"
     stroke-linejoin="round"
     role="img"
-    aria-label="${meta.name} icon"
+    aria-label="${meta.name} icon"${perspectiveAttr}
     @mouseenter="handleEnter"
     @click="handleClick"
   >

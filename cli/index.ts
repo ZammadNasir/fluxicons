@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { createInterface } from "node:readline";
 import {
   getIconSource,
   listIconSlugs,
@@ -47,11 +48,84 @@ function resolveFramework(input: string): string | undefined {
   return aliases[key];
 }
 
+/** Name of the folder FluxIcons creates inside the project's components dir. */
+const FLUX_ICONS_DIR = "flux-icons";
+
+/**
+ * Find the project's existing components directory, checking the conventional
+ * locations across frameworks (Next.js with/without `src/`, Vite, etc.). Falls
+ * back to a sensible spot to create one when none exists yet.
+ */
+function detectComponentsDir(): string {
+  const candidates = [
+    join("src", "components"),
+    "components",
+    join("app", "components"),
+    join("src", "app", "components"),
+  ];
+  for (const candidate of candidates) {
+    if (existsSync(join(process.cwd(), candidate))) return candidate;
+  }
+  // No components folder yet — put one where the project keeps its source.
+  return existsSync(join(process.cwd(), "src"))
+    ? join("src", "components")
+    : "components";
+}
+
+/** Resolve the directory icons are written to (honoring an explicit --out). */
+function resolveOutputDir(outDir?: string): string {
+  return outDir ?? join(detectComponentsDir(), FLUX_ICONS_DIR);
+}
+
 /** Default output location for a generated file in the user's project. */
-function outputPath(slug: string, ext: string, outDir?: string): string {
+function outputPath(slug: string, ext: string, dir: string): string {
   const fileBase = toPascalCase(slug);
-  const dir = outDir ?? "components/icons";
   return join(process.cwd(), dir, `${fileBase}.${ext}`);
+}
+
+/* ------------------------------- prompting -------------------------------- */
+
+/** Ask a single question on stdin and resolve with the trimmed answer. */
+function ask(question: string): Promise<string> {
+  const rl = createInterface({ input: process.stdin, output: process.stdout });
+  return new Promise((resolve) => {
+    rl.question(question, (answer) => {
+      rl.close();
+      resolve(answer.trim());
+    });
+  });
+}
+
+/**
+ * Prompt the user to pick a framework. Accepts a number, name, or alias; an
+ * empty answer takes the first option. Falls back to the first framework in
+ * non-interactive environments (no TTY).
+ */
+async function promptFramework(): Promise<string> {
+  const keys = Object.keys(ICON_GENERATORS);
+
+  if (!process.stdin.isTTY) return keys[0];
+
+  console.log(`\n${bold("Which framework?")}`);
+  keys.forEach((key, i) => {
+    console.log(`  ${cyan(String(i + 1))}) ${ICON_GENERATORS[key].displayName}`);
+  });
+
+  const answer = await ask(`\n${dim(`Select [1-${keys.length}, default 1]:`)} `);
+  if (answer === "") return keys[0];
+
+  const num = Number(answer);
+  if (Number.isInteger(num) && num >= 1 && num <= keys.length) {
+    return keys[num - 1];
+  }
+
+  const resolved = resolveFramework(answer);
+  if (resolved && keys.includes(resolved)) return resolved;
+
+  console.log(
+    yellow(`Unrecognized choice — defaulting to ${ICON_GENERATORS[keys[0]].displayName}.`),
+  );
+  return keys[0];
 }
 
 /** Make a path relative to cwd for display. */
@@ -64,7 +138,8 @@ function rel(absPath: string): string {
 interface Args {
   command?: string;
   icons: string[];
-  framework: string;
+  /** Resolved framework, or undefined when not provided (prompt for it). */
+  framework?: string;
   outDir?: string;
   force: boolean;
   help: boolean;
@@ -74,12 +149,11 @@ interface Args {
 function parseArgs(argv: string[]): Args {
   const args: Args = {
     icons: [],
-    framework: "react",
     force: false,
     help: false,
     version: false,
   };
-  let frameworkRaw = "react";
+  let frameworkRaw: string | undefined;
 
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -95,13 +169,17 @@ function parseArgs(argv: string[]): Args {
     else args.icons.push(a);
   }
 
-  const resolved = resolveFramework(frameworkRaw);
-  if (!resolved) {
-    fail(
-      `Unknown framework "${frameworkRaw}". Available: ${Object.keys(ICON_GENERATORS).join(", ")}.`,
-    );
+  // Only resolve when --framework was passed; otherwise leave it unset so the
+  // `add` command can prompt for it interactively.
+  if (frameworkRaw !== undefined) {
+    const resolved = resolveFramework(frameworkRaw);
+    if (!resolved) {
+      fail(
+        `Unknown framework "${frameworkRaw}". Available: ${Object.keys(ICON_GENERATORS).join(", ")}.`,
+      );
+    }
+    args.framework = resolved;
   }
-  args.framework = resolved;
   return args;
 }
 
@@ -119,8 +197,8 @@ ${bold("Commands")}
   ${cyan("list")}            List every available icon
 
 ${bold("Options")}
-  ${cyan("-f, --framework")}   react | vue ${dim("(default: react)")}
-  ${cyan("-o, --out")}         Output directory ${dim("(default: components/icons)")}
+  ${cyan("-f, --framework")}   react | vue ${dim("(prompts if omitted)")}
+  ${cyan("-o, --out")}         Output directory ${dim("(default: <components>/flux-icons, auto-detected)")}
   ${cyan("    --force")}       Overwrite existing files
   ${cyan("-h, --help")}        Show this help
   ${cyan("-v, --version")}     Show the version
@@ -144,15 +222,20 @@ function printList(): void {
 
 /* --------------------------------- add ------------------------------------ */
 
-function add(args: Args): void {
+async function add(args: Args): Promise<void> {
   if (args.icons.length === 0) {
     fail("No icon specified. Try `fluxicons add bell` or `fluxicons list`.");
   }
 
-  const generator = getIconGenerator(args.framework);
+  // Ask for the framework when it wasn't passed via --framework.
+  const framework = args.framework ?? (await promptFramework());
+
+  const generator = getIconGenerator(framework);
   if (!generator) {
-    fail(`Unknown framework "${args.framework}".`);
+    fail(`Unknown framework "${framework}".`);
   }
+
+  const outDir = resolveOutputDir(args.outDir);
 
   let written = 0;
   let depsNote = "";
@@ -169,7 +252,7 @@ function add(args: Args): void {
     }
 
     const output = generator!.generate(source.spec, source.paths, source.metadata);
-    const dest = outputPath(slug, output.fileExtension, args.outDir);
+    const dest = outputPath(slug, output.fileExtension, outDir);
 
     if (existsSync(dest) && !args.force) {
       console.log(
@@ -194,7 +277,7 @@ function add(args: Args): void {
 
 /* --------------------------------- main ----------------------------------- */
 
-function main(): void {
+async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
 
   if (args.version) {
@@ -208,7 +291,7 @@ function main(): void {
 
   switch (args.command) {
     case "add":
-      add(args);
+      await add(args);
       break;
     case "list":
     case "ls":
@@ -219,4 +302,7 @@ function main(): void {
   }
 }
 
-main();
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

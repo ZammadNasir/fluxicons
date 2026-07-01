@@ -1,6 +1,6 @@
 {
   "name": "@zammadnasir/fluxicons",
-  "version": "0.1.0-beta.3",
+  "version": "0.1.0-beta.5",
   "private": false,
   "description": "Animated icons for every framework",
   "main": "dist/index.js",

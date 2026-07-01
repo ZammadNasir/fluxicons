@@ -60,6 +60,8 @@ export interface GeneratorConfig {
     strokeWidth: number;
     trigger: AnimationTrigger;
     speed: number;
+    loop: boolean;
+    delay: number;
   }>;
 }
 

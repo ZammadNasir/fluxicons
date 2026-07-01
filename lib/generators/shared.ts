@@ -48,6 +48,19 @@ export function isContinuous(spec: AnimationSpec): boolean {
   return (spec.sequences.continuous?.length ?? 0) > 0;
 }
 
+/** Transform properties that rotate in 3D and therefore need a perspective. */
+export const ROTATE_3D_PROPS = new Set(["rotateX", "rotateY"]);
+
+/** Whether any step uses a 3D rotation (`rotateX`/`rotateY`). */
+export function uses3DTransform(spec: AnimationSpec): boolean {
+  return allSteps(spec).some((s) => ROTATE_3D_PROPS.has(s.property));
+}
+
+/** The perspective (px) for a 3D icon: the spec's value, or a sensible default. */
+export function perspectiveFor(spec: AnimationSpec): number {
+  return spec.perspective ?? 500;
+}
+
 /** CSS `animation-timing-function` value for a named easing. */
 export function cssEasing(ease: EasingName): string {
   switch (ease) {

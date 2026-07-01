@@ -12,7 +12,11 @@ import type { AnimationTrigger } from "@/lib/icon-registry";
 /** A property that a generator knows how to animate. */
 export type AnimatableProperty =
   | "rotate"
+  | "rotateX" // 3D rotation around the X axis (flip up/down); needs perspective
+  | "rotateY" // 3D rotation around the Y axis (swing like a door); needs perspective
   | "scale"
+  | "scaleX"
+  | "scaleY"
   | "translateX"
   | "translateY"
   | "opacity"
@@ -83,6 +87,13 @@ export interface AnimationSpec {
 
   /** If true, the continuous sequence loops even after the trigger fires. */
   alwaysLoop?: boolean;
+
+  /**
+   * CSS perspective (in px) applied to the SVG root so 3D rotations
+   * (`rotateX`/`rotateY`) render with depth. Defaults to 500 when an icon uses
+   * a 3D rotation and this is omitted.
+   */
+  perspective?: number;
 }
 
 /**

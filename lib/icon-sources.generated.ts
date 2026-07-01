@@ -2,15 +2,27 @@
 // Run `npm run generate` (or build) to refresh after adding/removing an icon.
 import type { IconSource } from "@/lib/icon-sources";
 
+import { badgeCheckPaths } from "@/icons/badge-check/paths";
+import badgeCheckSpec from "@/icons/badge-check/animation.spec";
+import { metadata as badgeCheckMeta } from "@/icons/badge-check/metadata";
+import { ballPaths } from "@/icons/ball/paths";
+import ballSpec from "@/icons/ball/animation.spec";
+import { metadata as ballMeta } from "@/icons/ball/metadata";
 import { bellPaths } from "@/icons/bell/paths";
 import bellSpec from "@/icons/bell/animation.spec";
 import { metadata as bellMeta } from "@/icons/bell/metadata";
+import { cardFlipPaths } from "@/icons/card-flip/paths";
+import cardFlipSpec from "@/icons/card-flip/animation.spec";
+import { metadata as cardFlipMeta } from "@/icons/card-flip/metadata";
 import { checkPaths } from "@/icons/check/paths";
 import checkSpec from "@/icons/check/animation.spec";
 import { metadata as checkMeta } from "@/icons/check/metadata";
 import { clockPaths } from "@/icons/clock/paths";
 import clockSpec from "@/icons/clock/animation.spec";
 import { metadata as clockMeta } from "@/icons/clock/metadata";
+import { doorPaths } from "@/icons/door/paths";
+import doorSpec from "@/icons/door/animation.spec";
+import { metadata as doorMeta } from "@/icons/door/metadata";
 import { downloadPaths } from "@/icons/download/paths";
 import downloadSpec from "@/icons/download/animation.spec";
 import { metadata as downloadMeta } from "@/icons/download/metadata";
@@ -29,9 +41,13 @@ import { metadata as userMeta } from "@/icons/user/metadata";
 
 /** Every icon's framework-agnostic source (pure data — no React). */
 export const ICON_SOURCES: Record<string, IconSource> = {
+  "badge-check": { paths: badgeCheckPaths, spec: badgeCheckSpec, metadata: badgeCheckMeta },
+  "ball": { paths: ballPaths, spec: ballSpec, metadata: ballMeta },
   "bell": { paths: bellPaths, spec: bellSpec, metadata: bellMeta },
+  "card-flip": { paths: cardFlipPaths, spec: cardFlipSpec, metadata: cardFlipMeta },
   "check": { paths: checkPaths, spec: checkSpec, metadata: checkMeta },
   "clock": { paths: clockPaths, spec: clockSpec, metadata: clockMeta },
+  "door": { paths: doorPaths, spec: doorSpec, metadata: doorMeta },
   "download": { paths: downloadPaths, spec: downloadSpec, metadata: downloadMeta },
   "heart": { paths: heartPaths, spec: heartSpec, metadata: heartMeta },
   "loader": { paths: loaderPaths, spec: loaderSpec, metadata: loaderMeta },
