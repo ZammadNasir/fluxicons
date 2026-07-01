@@ -11,6 +11,7 @@ import { metadata as checkMeta } from "@/icons/check/metadata";
 import { metadata as clockMeta } from "@/icons/clock/metadata";
 import { metadata as doorMeta } from "@/icons/door/metadata";
 import { metadata as downloadMeta } from "@/icons/download/metadata";
+import { metadata as externalLinkMeta } from "@/icons/external-link/metadata";
 import { metadata as heartMeta } from "@/icons/heart/metadata";
 import { metadata as loaderMeta } from "@/icons/loader/metadata";
 import { metadata as searchMeta } from "@/icons/search/metadata";
@@ -26,6 +27,7 @@ export const ICON_METADATA: Record<string, IconMetadata> = {
   "clock": clockMeta,
   "door": doorMeta,
   "download": downloadMeta,
+  "external-link": externalLinkMeta,
   "heart": heartMeta,
   "loader": loaderMeta,
   "search": searchMeta,
@@ -45,6 +47,7 @@ export const ICON_IMPORTS: Record<
   "clock": () => import("@/icons/clock"),
   "door": () => import("@/icons/door"),
   "download": () => import("@/icons/download"),
+  "external-link": () => import("@/icons/external-link"),
   "heart": () => import("@/icons/heart"),
   "loader": () => import("@/icons/loader"),
   "search": () => import("@/icons/search"),

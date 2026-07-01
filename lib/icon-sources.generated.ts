@@ -26,6 +26,9 @@ import { metadata as doorMeta } from "@/icons/door/metadata";
 import { downloadPaths } from "@/icons/download/paths";
 import downloadSpec from "@/icons/download/animation.spec";
 import { metadata as downloadMeta } from "@/icons/download/metadata";
+import { externalLinkPaths } from "@/icons/external-link/paths";
+import externalLinkSpec from "@/icons/external-link/animation.spec";
+import { metadata as externalLinkMeta } from "@/icons/external-link/metadata";
 import { heartPaths } from "@/icons/heart/paths";
 import heartSpec from "@/icons/heart/animation.spec";
 import { metadata as heartMeta } from "@/icons/heart/metadata";
@@ -49,6 +52,7 @@ export const ICON_SOURCES: Record<string, IconSource> = {
   "clock": { paths: clockPaths, spec: clockSpec, metadata: clockMeta },
   "door": { paths: doorPaths, spec: doorSpec, metadata: doorMeta },
   "download": { paths: downloadPaths, spec: downloadSpec, metadata: downloadMeta },
+  "external-link": { paths: externalLinkPaths, spec: externalLinkSpec, metadata: externalLinkMeta },
   "heart": { paths: heartPaths, spec: heartSpec, metadata: heartMeta },
   "loader": { paths: loaderPaths, spec: loaderSpec, metadata: loaderMeta },
   "search": { paths: searchPaths, spec: searchSpec, metadata: searchMeta },
