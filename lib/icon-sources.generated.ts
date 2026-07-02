@@ -35,6 +35,9 @@ import { metadata as heartMeta } from "@/icons/heart/metadata";
 import { helpPaths } from "@/icons/help/paths";
 import helpSpec from "@/icons/help/animation.spec";
 import { metadata as helpMeta } from "@/icons/help/metadata";
+import { layersPaths } from "@/icons/layers/paths";
+import layersSpec from "@/icons/layers/animation.spec";
+import { metadata as layersMeta } from "@/icons/layers/metadata";
 import { refreshPaths } from "@/icons/refresh/paths";
 import refreshSpec from "@/icons/refresh/animation.spec";
 import { metadata as refreshMeta } from "@/icons/refresh/metadata";
@@ -61,6 +64,7 @@ export const ICON_SOURCES: Record<string, IconSource> = {
   "external-link": { paths: externalLinkPaths, spec: externalLinkSpec, metadata: externalLinkMeta },
   "heart": { paths: heartPaths, spec: heartSpec, metadata: heartMeta },
   "help": { paths: helpPaths, spec: helpSpec, metadata: helpMeta },
+  "layers": { paths: layersPaths, spec: layersSpec, metadata: layersMeta },
   "refresh": { paths: refreshPaths, spec: refreshSpec, metadata: refreshMeta },
   "search": { paths: searchPaths, spec: searchSpec, metadata: searchMeta },
   "user": { paths: userPaths, spec: userSpec, metadata: userMeta },

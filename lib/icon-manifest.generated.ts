@@ -25,6 +25,8 @@ import { metadata as heartMeta } from "@/icons/heart/metadata";
 import heartSpec from "@/icons/heart/animation.spec";
 import { metadata as helpMeta } from "@/icons/help/metadata";
 import helpSpec from "@/icons/help/animation.spec";
+import { metadata as layersMeta } from "@/icons/layers/metadata";
+import layersSpec from "@/icons/layers/animation.spec";
 import { metadata as refreshMeta } from "@/icons/refresh/metadata";
 import refreshSpec from "@/icons/refresh/animation.spec";
 import { metadata as searchMeta } from "@/icons/search/metadata";
@@ -47,6 +49,7 @@ export const ICON_METADATA: Record<string, IconMetadata> = {
   "external-link": { ...externalLinkMeta, defaultTrigger: externalLinkSpec.defaultTrigger },
   "heart": { ...heartMeta, defaultTrigger: heartSpec.defaultTrigger },
   "help": { ...helpMeta, defaultTrigger: helpSpec.defaultTrigger },
+  "layers": { ...layersMeta, defaultTrigger: layersSpec.defaultTrigger },
   "refresh": { ...refreshMeta, defaultTrigger: refreshSpec.defaultTrigger },
   "search": { ...searchMeta, defaultTrigger: searchSpec.defaultTrigger },
   "user": { ...userMeta, defaultTrigger: userSpec.defaultTrigger },
@@ -69,6 +72,7 @@ export const ICON_IMPORTS: Record<
   "external-link": () => import("@/icons/external-link"),
   "heart": () => import("@/icons/heart"),
   "help": () => import("@/icons/help"),
+  "layers": () => import("@/icons/layers"),
   "refresh": () => import("@/icons/refresh"),
   "search": () => import("@/icons/search"),
   "user": () => import("@/icons/user"),
