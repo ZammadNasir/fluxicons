@@ -35,9 +35,6 @@ import { metadata as heartMeta } from "@/icons/heart/metadata";
 import { helpPaths } from "@/icons/help/paths";
 import helpSpec from "@/icons/help/animation.spec";
 import { metadata as helpMeta } from "@/icons/help/metadata";
-import { loaderPaths } from "@/icons/loader/paths";
-import loaderSpec from "@/icons/loader/animation.spec";
-import { metadata as loaderMeta } from "@/icons/loader/metadata";
 import { refreshPaths } from "@/icons/refresh/paths";
 import refreshSpec from "@/icons/refresh/animation.spec";
 import { metadata as refreshMeta } from "@/icons/refresh/metadata";
@@ -53,20 +50,35 @@ import { metadata as wifiMeta } from "@/icons/wifi/metadata";
 
 /** Every icon's framework-agnostic source (pure data — no React). */
 export const ICON_SOURCES: Record<string, IconSource> = {
-  "badge-check": { paths: badgeCheckPaths, spec: badgeCheckSpec, metadata: badgeCheckMeta },
-  "ball": { paths: ballPaths, spec: ballSpec, metadata: ballMeta },
-  "bell": { paths: bellPaths, spec: bellSpec, metadata: bellMeta },
-  "card-flip": { paths: cardFlipPaths, spec: cardFlipSpec, metadata: cardFlipMeta },
-  "check": { paths: checkPaths, spec: checkSpec, metadata: checkMeta },
-  "clock": { paths: clockPaths, spec: clockSpec, metadata: clockMeta },
-  "door": { paths: doorPaths, spec: doorSpec, metadata: doorMeta },
-  "download": { paths: downloadPaths, spec: downloadSpec, metadata: downloadMeta },
-  "external-link": { paths: externalLinkPaths, spec: externalLinkSpec, metadata: externalLinkMeta },
-  "heart": { paths: heartPaths, spec: heartSpec, metadata: heartMeta },
-  "help": { paths: helpPaths, spec: helpSpec, metadata: helpMeta },
-  "loader": { paths: loaderPaths, spec: loaderSpec, metadata: loaderMeta },
-  "refresh": { paths: refreshPaths, spec: refreshSpec, metadata: refreshMeta },
-  "search": { paths: searchPaths, spec: searchSpec, metadata: searchMeta },
-  "user": { paths: userPaths, spec: userSpec, metadata: userMeta },
-  "wifi": { paths: wifiPaths, spec: wifiSpec, metadata: wifiMeta },
+  "badge-check": {
+    paths: badgeCheckPaths,
+    spec: badgeCheckSpec,
+    metadata: badgeCheckMeta,
+  },
+  ball: { paths: ballPaths, spec: ballSpec, metadata: ballMeta },
+  bell: { paths: bellPaths, spec: bellSpec, metadata: bellMeta },
+  "card-flip": {
+    paths: cardFlipPaths,
+    spec: cardFlipSpec,
+    metadata: cardFlipMeta,
+  },
+  check: { paths: checkPaths, spec: checkSpec, metadata: checkMeta },
+  clock: { paths: clockPaths, spec: clockSpec, metadata: clockMeta },
+  door: { paths: doorPaths, spec: doorSpec, metadata: doorMeta },
+  download: {
+    paths: downloadPaths,
+    spec: downloadSpec,
+    metadata: downloadMeta,
+  },
+  "external-link": {
+    paths: externalLinkPaths,
+    spec: externalLinkSpec,
+    metadata: externalLinkMeta,
+  },
+  heart: { paths: heartPaths, spec: heartSpec, metadata: heartMeta },
+  help: { paths: helpPaths, spec: helpSpec, metadata: helpMeta },
+  refresh: { paths: refreshPaths, spec: refreshSpec, metadata: refreshMeta },
+  search: { paths: searchPaths, spec: searchSpec, metadata: searchMeta },
+  user: { paths: userPaths, spec: userSpec, metadata: userMeta },
+  wifi: { paths: wifiPaths, spec: wifiSpec, metadata: wifiMeta },
 };
