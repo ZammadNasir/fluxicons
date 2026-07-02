@@ -29,6 +29,9 @@ import { metadata as downloadMeta } from "@/icons/download/metadata";
 import { externalLinkPaths } from "@/icons/external-link/paths";
 import externalLinkSpec from "@/icons/external-link/animation.spec";
 import { metadata as externalLinkMeta } from "@/icons/external-link/metadata";
+import { eyePaths } from "@/icons/eye/paths";
+import eyeSpec from "@/icons/eye/animation.spec";
+import { metadata as eyeMeta } from "@/icons/eye/metadata";
 import { heartPaths } from "@/icons/heart/paths";
 import heartSpec from "@/icons/heart/animation.spec";
 import { metadata as heartMeta } from "@/icons/heart/metadata";
@@ -44,6 +47,9 @@ import { metadata as refreshMeta } from "@/icons/refresh/metadata";
 import { searchPaths } from "@/icons/search/paths";
 import searchSpec from "@/icons/search/animation.spec";
 import { metadata as searchMeta } from "@/icons/search/metadata";
+import { signalPaths } from "@/icons/signal/paths";
+import signalSpec from "@/icons/signal/animation.spec";
+import { metadata as signalMeta } from "@/icons/signal/metadata";
 import { userPaths } from "@/icons/user/paths";
 import userSpec from "@/icons/user/animation.spec";
 import { metadata as userMeta } from "@/icons/user/metadata";
@@ -62,11 +68,13 @@ export const ICON_SOURCES: Record<string, IconSource> = {
   "door": { paths: doorPaths, spec: doorSpec, metadata: doorMeta },
   "download": { paths: downloadPaths, spec: downloadSpec, metadata: downloadMeta },
   "external-link": { paths: externalLinkPaths, spec: externalLinkSpec, metadata: externalLinkMeta },
+  "eye": { paths: eyePaths, spec: eyeSpec, metadata: eyeMeta },
   "heart": { paths: heartPaths, spec: heartSpec, metadata: heartMeta },
   "help": { paths: helpPaths, spec: helpSpec, metadata: helpMeta },
   "layers": { paths: layersPaths, spec: layersSpec, metadata: layersMeta },
   "refresh": { paths: refreshPaths, spec: refreshSpec, metadata: refreshMeta },
   "search": { paths: searchPaths, spec: searchSpec, metadata: searchMeta },
+  "signal": { paths: signalPaths, spec: signalSpec, metadata: signalMeta },
   "user": { paths: userPaths, spec: userSpec, metadata: userMeta },
   "wifi": { paths: wifiPaths, spec: wifiSpec, metadata: wifiMeta },
 };

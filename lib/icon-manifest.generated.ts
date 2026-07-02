@@ -21,6 +21,8 @@ import { metadata as downloadMeta } from "@/icons/download/metadata";
 import downloadSpec from "@/icons/download/animation.spec";
 import { metadata as externalLinkMeta } from "@/icons/external-link/metadata";
 import externalLinkSpec from "@/icons/external-link/animation.spec";
+import { metadata as eyeMeta } from "@/icons/eye/metadata";
+import eyeSpec from "@/icons/eye/animation.spec";
 import { metadata as heartMeta } from "@/icons/heart/metadata";
 import heartSpec from "@/icons/heart/animation.spec";
 import { metadata as helpMeta } from "@/icons/help/metadata";
@@ -31,6 +33,8 @@ import { metadata as refreshMeta } from "@/icons/refresh/metadata";
 import refreshSpec from "@/icons/refresh/animation.spec";
 import { metadata as searchMeta } from "@/icons/search/metadata";
 import searchSpec from "@/icons/search/animation.spec";
+import { metadata as signalMeta } from "@/icons/signal/metadata";
+import signalSpec from "@/icons/signal/animation.spec";
 import { metadata as userMeta } from "@/icons/user/metadata";
 import userSpec from "@/icons/user/animation.spec";
 import { metadata as wifiMeta } from "@/icons/wifi/metadata";
@@ -47,11 +51,13 @@ export const ICON_METADATA: Record<string, IconMetadata> = {
   "door": { ...doorMeta, defaultTrigger: doorSpec.defaultTrigger },
   "download": { ...downloadMeta, defaultTrigger: downloadSpec.defaultTrigger },
   "external-link": { ...externalLinkMeta, defaultTrigger: externalLinkSpec.defaultTrigger },
+  "eye": { ...eyeMeta, defaultTrigger: eyeSpec.defaultTrigger },
   "heart": { ...heartMeta, defaultTrigger: heartSpec.defaultTrigger },
   "help": { ...helpMeta, defaultTrigger: helpSpec.defaultTrigger },
   "layers": { ...layersMeta, defaultTrigger: layersSpec.defaultTrigger },
   "refresh": { ...refreshMeta, defaultTrigger: refreshSpec.defaultTrigger },
   "search": { ...searchMeta, defaultTrigger: searchSpec.defaultTrigger },
+  "signal": { ...signalMeta, defaultTrigger: signalSpec.defaultTrigger },
   "user": { ...userMeta, defaultTrigger: userSpec.defaultTrigger },
   "wifi": { ...wifiMeta, defaultTrigger: wifiSpec.defaultTrigger },
 };
@@ -70,11 +76,13 @@ export const ICON_IMPORTS: Record<
   "door": () => import("@/icons/door"),
   "download": () => import("@/icons/download"),
   "external-link": () => import("@/icons/external-link"),
+  "eye": () => import("@/icons/eye"),
   "heart": () => import("@/icons/heart"),
   "help": () => import("@/icons/help"),
   "layers": () => import("@/icons/layers"),
   "refresh": () => import("@/icons/refresh"),
   "search": () => import("@/icons/search"),
+  "signal": () => import("@/icons/signal"),
   "user": () => import("@/icons/user"),
   "wifi": () => import("@/icons/wifi"),
 };

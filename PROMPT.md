@@ -187,4 +187,6 @@ Every FluxIcon exposes a runtime `trigger` prop. `defaultTrigger` in the spec on
 
 ## Now generate this icon: **{ICON_NAME}**
 
+## Minimal animation description: **{{DESCRIPTION}}**
+
 (Provide slug, category, and any specific animation idea here if you have one — otherwise infer sensible ones.)
