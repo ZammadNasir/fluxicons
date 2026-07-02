@@ -4,38 +4,53 @@ import type { ComponentType } from "react";
 import type { IconMetadata, IconProps } from "@/lib/icon-registry";
 
 import { metadata as badgeCheckMeta } from "@/icons/badge-check/metadata";
+import badgeCheckSpec from "@/icons/badge-check/animation.spec";
 import { metadata as ballMeta } from "@/icons/ball/metadata";
+import ballSpec from "@/icons/ball/animation.spec";
 import { metadata as bellMeta } from "@/icons/bell/metadata";
+import bellSpec from "@/icons/bell/animation.spec";
 import { metadata as cardFlipMeta } from "@/icons/card-flip/metadata";
+import cardFlipSpec from "@/icons/card-flip/animation.spec";
 import { metadata as checkMeta } from "@/icons/check/metadata";
+import checkSpec from "@/icons/check/animation.spec";
 import { metadata as clockMeta } from "@/icons/clock/metadata";
+import clockSpec from "@/icons/clock/animation.spec";
 import { metadata as doorMeta } from "@/icons/door/metadata";
+import doorSpec from "@/icons/door/animation.spec";
 import { metadata as downloadMeta } from "@/icons/download/metadata";
+import downloadSpec from "@/icons/download/animation.spec";
 import { metadata as externalLinkMeta } from "@/icons/external-link/metadata";
+import externalLinkSpec from "@/icons/external-link/animation.spec";
 import { metadata as heartMeta } from "@/icons/heart/metadata";
+import heartSpec from "@/icons/heart/animation.spec";
 import { metadata as helpMeta } from "@/icons/help/metadata";
+import helpSpec from "@/icons/help/animation.spec";
 import { metadata as refreshMeta } from "@/icons/refresh/metadata";
+import refreshSpec from "@/icons/refresh/animation.spec";
 import { metadata as searchMeta } from "@/icons/search/metadata";
+import searchSpec from "@/icons/search/animation.spec";
 import { metadata as userMeta } from "@/icons/user/metadata";
+import userSpec from "@/icons/user/animation.spec";
 import { metadata as wifiMeta } from "@/icons/wifi/metadata";
+import wifiSpec from "@/icons/wifi/animation.spec";
 
 /** Metadata for every icon, keyed by slug. */
 export const ICON_METADATA: Record<string, IconMetadata> = {
-  "badge-check": badgeCheckMeta,
-  ball: ballMeta,
-  bell: bellMeta,
-  "card-flip": cardFlipMeta,
-  check: checkMeta,
-  clock: clockMeta,
-  door: doorMeta,
-  download: downloadMeta,
-  "external-link": externalLinkMeta,
-  heart: heartMeta,
-  help: helpMeta,
-  refresh: refreshMeta,
-  search: searchMeta,
-  user: userMeta,
-  wifi: wifiMeta,
+  "badge-check": { ...badgeCheckMeta, defaultTrigger: badgeCheckSpec.defaultTrigger },
+  "ball": { ...ballMeta, defaultTrigger: ballSpec.defaultTrigger },
+  "bell": { ...bellMeta, defaultTrigger: bellSpec.defaultTrigger },
+  "card-flip": { ...cardFlipMeta, defaultTrigger: cardFlipSpec.defaultTrigger },
+  "check": { ...checkMeta, defaultTrigger: checkSpec.defaultTrigger },
+  "clock": { ...clockMeta, defaultTrigger: clockSpec.defaultTrigger },
+  "door": { ...doorMeta, defaultTrigger: doorSpec.defaultTrigger },
+  "download": { ...downloadMeta, defaultTrigger: downloadSpec.defaultTrigger },
+  "external-link": { ...externalLinkMeta, defaultTrigger: externalLinkSpec.defaultTrigger },
+  "heart": { ...heartMeta, defaultTrigger: heartSpec.defaultTrigger },
+  "help": { ...helpMeta, defaultTrigger: helpSpec.defaultTrigger },
+  "refresh": { ...refreshMeta, defaultTrigger: refreshSpec.defaultTrigger },
+  "search": { ...searchMeta, defaultTrigger: searchSpec.defaultTrigger },
+  "user": { ...userMeta, defaultTrigger: userSpec.defaultTrigger },
+  "wifi": { ...wifiMeta, defaultTrigger: wifiSpec.defaultTrigger },
 };
 
 /** Lazy component loaders keyed by slug (one chunk per icon). */
@@ -44,18 +59,18 @@ export const ICON_IMPORTS: Record<
   () => Promise<{ default: ComponentType<IconProps> }>
 > = {
   "badge-check": () => import("@/icons/badge-check"),
-  ball: () => import("@/icons/ball"),
-  bell: () => import("@/icons/bell"),
+  "ball": () => import("@/icons/ball"),
+  "bell": () => import("@/icons/bell"),
   "card-flip": () => import("@/icons/card-flip"),
-  check: () => import("@/icons/check"),
-  clock: () => import("@/icons/clock"),
-  door: () => import("@/icons/door"),
-  download: () => import("@/icons/download"),
+  "check": () => import("@/icons/check"),
+  "clock": () => import("@/icons/clock"),
+  "door": () => import("@/icons/door"),
+  "download": () => import("@/icons/download"),
   "external-link": () => import("@/icons/external-link"),
-  heart: () => import("@/icons/heart"),
-  help: () => import("@/icons/help"),
-  refresh: () => import("@/icons/refresh"),
-  search: () => import("@/icons/search"),
-  user: () => import("@/icons/user"),
-  wifi: () => import("@/icons/wifi"),
+  "heart": () => import("@/icons/heart"),
+  "help": () => import("@/icons/help"),
+  "refresh": () => import("@/icons/refresh"),
+  "search": () => import("@/icons/search"),
+  "user": () => import("@/icons/user"),
+  "wifi": () => import("@/icons/wifi"),
 };

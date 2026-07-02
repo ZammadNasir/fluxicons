@@ -60,6 +60,7 @@ import { forwardRef } from "react";
 import { motion, type Variants } from "motion/react";
 import type { IconProps } from "@/lib/icon-registry";
 import { useIconControls } from "@/lib/icons/use-icon-controls";
+import bellSpec from "./animation.spec";
 import { bellPaths } from "./paths";
 
 const EASE: [number, number, number, number] = [0.4, 0, 0.2, 1];
@@ -75,7 +76,7 @@ const Bell = forwardRef<SVGSVGElement, IconProps>(
       size = 24,
       color = "currentColor",
       strokeWidth = 1.5,
-      trigger = "hover",
+      trigger = bellSpec.defaultTrigger,
       speed = 1,
       loop = false,
       delay = 0,
@@ -163,8 +164,11 @@ Every FluxIcon exposes a runtime `trigger` prop. `defaultTrigger` in the spec on
 
 **FluxIcons is framework-agnostic, and `animation.spec.ts` is the single source of truth.** The React `.tsx` you write is only ONE target: the Vue build (and any future framework) is generated automatically from the spec by the code generators. Every trigger's behavior — including `hoverHold` — is derived from the spec's `values`, in whatever framework the icon is emitted. So you must author the spec so it is correct for ALL triggers, not just `hover`:
 
-- **Make each transform/opacity `values` array a round-trip: it must start and end at the resting value** (e.g. `[0, -12, 12, -9, 9, -5, 0]` — first and last are both `0`). Generators detect `values[0] === values[last]` to build the `hoverHold` "held at peak" pose (they drop the trailing return-to-rest frame) and its reverse (peak → rest on leave). If your values do NOT return to rest, `hoverHold` has no distinct hold pose and degrades to looking like `hover` — the exact bug to avoid. (Draw-style `pathLength` animations that end "complete" are the natural exception and need no return frame.)
-- Your React `hold` variant must mirror this rule exactly (see the Rules below): it is the `animate` motion minus the trailing return-to-rest keyframe, with `repeat: 0`. The generators reproduce this derivation for other frameworks, so keeping `animate`/`hold` consistent here is what makes the icon behave identically everywhere.
+- A `values` array takes one of two shapes, and the generators derive `hoverHold` from whichever you use:
+  - **Round-trip** (the common, versatile shape): `values` start and end at the resting value, e.g. `[0, -12, 12, -9, 9, -5, 0]` or Download's `[0, 3, 0]`. Generators detect `values[0] === values[last]`, drop the trailing rest frame to build the `hoverHold` held pose (`[0, -12, 12, -9, 9, -5]` / `[0, 3]`), and reverse it for the return on leave. This shape works for BOTH triggers — `hover` plays the full round-trip, `hoverHold` holds the trimmed peak — so it's the default choice (Download is a round-trip that defaults to `hoverHold`).
+  - **Destination** (use only when a round-trip doesn't make sense): `values` end AT the pose you want to hold and do NOT return, e.g. CardFlip `[0, 180]`. `hoverHold` holds that final value and reverses it on leave; note `hover` would flip and stay rather than return, which is why this shape is reserved for hold-first icons.
+  - Either way, the pose `hoverHold` freezes on must be intentional and readable. The failure case is a value array whose only non-rest content is a transient mid-gesture (freezing there looks broken) — keep that icon on `"hover"`. (Draw-style `pathLength` animations that end "complete" are naturally destination-shaped and need no return frame.)
+- Your React `hold` variant must match the values the generators would produce: for a return-to-rest gesture, `animate` minus the trailing rest keyframe; for a destination, the same values as `animate`. Always `repeat: 0`. Keeping `animate`/`hold` consistent is what makes the icon behave identically in every framework.
 - Never bake a single trigger's behavior into the geometry or timing. The `trigger` prop is switched at runtime; the same icon must be able to hover, hoverHold, click, autoplay, etc.
 
 ## Rules
@@ -173,9 +177,11 @@ Every FluxIcon exposes a runtime `trigger` prop. `defaultTrigger` in the spec on
 - Element keys must match across paths.ts, animation.spec.ts `elements`, and the `id` attrs in the component (kebab-case, prefixed with slug, e.g. `<slug>-<element>`).
 - Naming: PascalCase component name, kebab-case slug, camelCase+`Paths`/`Spec` suffix for exports.
 - Animation must fit the icon's real-world physics (pick the property: rotate/scale/scaleX-Y/translateX-Y/opacity/pathLength/rotateX-Y/strokeWidth) with `easeInOut` and shared EASE `[0.4,0,0.2,1]` in the component.
-- Component always defines exactly 3 variants: `normal`, `animate`, `hold`. `normal` = the resting pose. `animate` = the full round-trip (starts and ends at rest), `repeat: loop ? Infinity : 0`. `hold` = the SAME motion as `animate` but with the trailing return-to-rest keyframe dropped so it ends at the peak and stays there, always `repeat: 0`. These three variants are the contract every framework relies on — see the Triggers section for why the round-trip and `hold` derivation matter across frameworks.
+- Component always defines exactly 3 variants: `normal`, `animate`, `hold`. `normal` = the resting pose. `animate` = the motion (a round-trip back to rest for gesture icons, or ending at the destination for hold icons), `repeat: loop ? Infinity : 0`. `hold` = the pose `hoverHold` freezes on: `animate` minus the trailing return-to-rest keyframe for a round-trip, or the same values as `animate` for a destination — always `repeat: 0`. These three variants are the contract every framework relies on — see the Triggers section for the two value shapes and how `hold` is derived across frameworks.
 - Static (non-moving) sub-elements stay as plain `<path>`/`<circle>`/`<line>`, not `motion.*`.
-- Duration always divided by `speed`; `delay` passed straight through; `defaultTrigger` is `"hover"` unless there's a strong reason otherwise.
+- Duration always divided by `speed`; `delay` passed straight through.
+- `defaultTrigger` lives ONLY in `animation.spec.ts` — it is the single source of truth. The component must derive its default from it (`import <slug>Spec from "./animation.spec"` and `trigger = <slug>Spec.defaultTrigger`), never hardcode a literal like `trigger = "hover"`. The website registry reads the same spec field, so the whole system stays in sync.
+- Choosing `defaultTrigger` (see the Triggers section for the full rule): use `"hover"` for gesture motions whose point is the round-trip (bell rock, heart beat, bounce, spin). Use `"hoverHold"` when the animation settles at a meaningful, stable pose worth holding (an arrow that lands, a door that opens, a card that flips to its back). The `values` shape is independent of this choice — a round-trip like Download's `[0, 3, 0]` (trimmed to the held pose) works for `hoverHold` just as well as a destination like CardFlip's `[0, 180]`; what matters is that the held pose reads well.
 - No comments in variants/JSX body; one JSDoc block above the component; no semicolons... wait, ignore that last one — use standard TS with semicolons as shown above.
 - Output ONLY the 4 files (paths.ts, animation.spec.ts, <Name>.tsx, metadata.ts) in full, no extra commentary.
 

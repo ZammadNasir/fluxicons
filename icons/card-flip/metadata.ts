@@ -8,5 +8,5 @@ export const metadata: IconMetadata = {
   featured: false,
   description: "A card that flips forward to reveal its other side.",
   animationDescription:
-    "The card rotates a full turn around its horizontal axis (a 3D flip).",
+    "The card flips to its back around its horizontal axis (a 3D half-turn), holding the flipped face while hovered.",
 };

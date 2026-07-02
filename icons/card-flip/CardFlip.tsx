@@ -4,6 +4,7 @@ import { forwardRef } from "react";
 import { motion, type Variants } from "motion/react";
 import type { IconProps } from "@/lib/icon-registry";
 import { useIconControls } from "@/lib/icons/use-icon-controls";
+import cardFlipSpec from "./animation.spec";
 import { cardFlipPaths } from "./paths";
 
 const EASE: [number, number, number, number] = [0.4, 0, 0.2, 1];
@@ -14,9 +15,11 @@ const ORIGIN = {
 } as const;
 
 /**
- * CardFlip — a card that flips forward.
- * Animation: a 3D `rotateX` full turn around the card's horizontal axis,
+ * CardFlip — a card that flips to its back.
+ * Animation: a 3D `rotateX` half-turn around the card's horizontal axis,
  * rendered with perspective so it reads as depth rather than a vertical squash.
+ * With `hoverHold` (its default) it flips to the back and holds there while
+ * hovered, then flips back on leave.
  */
 const CardFlip = forwardRef<SVGSVGElement, IconProps>(
   (
@@ -24,7 +27,7 @@ const CardFlip = forwardRef<SVGSVGElement, IconProps>(
       size = 24,
       color = "currentColor",
       strokeWidth = 1.5,
-      trigger = "hover",
+      trigger = cardFlipSpec.defaultTrigger,
       speed = 1,
       loop = false,
       delay = 0,
@@ -45,7 +48,7 @@ const CardFlip = forwardRef<SVGSVGElement, IconProps>(
     const flip: Variants = {
       normal: { rotateX: 0 },
       animate: {
-        rotateX: [0, 180, 360],
+        rotateX: [0, 180],
         transition: {
           duration: 0.7 / speed,
           ease: EASE,
@@ -54,7 +57,7 @@ const CardFlip = forwardRef<SVGSVGElement, IconProps>(
         },
       },
       hold: {
-        rotateX: [0, 180, 360],
+        rotateX: [0, 180],
         transition: {
           duration: 0.7 / speed,
           ease: EASE,

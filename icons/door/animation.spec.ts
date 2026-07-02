@@ -27,7 +27,7 @@ const doorSpec: AnimationSpec = {
       },
     ],
   },
-  defaultTrigger: "hover",
+  defaultTrigger: "hoverHold",
   perspective: 500,
 };
 

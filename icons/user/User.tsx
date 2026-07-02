@@ -4,6 +4,7 @@ import { forwardRef } from "react";
 import { motion, type Variants } from "motion/react";
 import type { IconProps } from "@/lib/icon-registry";
 import { useIconControls } from "@/lib/icons/use-icon-controls";
+import userSpec from "./animation.spec";
 import { userPaths } from "./paths";
 
 const EASE: [number, number, number, number] = [0.4, 0, 0.2, 1];
@@ -18,7 +19,7 @@ const User = forwardRef<SVGSVGElement, IconProps>(
       size = 24,
       color = "currentColor",
       strokeWidth = 1.5,
-      trigger = "hover",
+      trigger = userSpec.defaultTrigger,
       speed = 1,
       loop = false,
       delay = 0,

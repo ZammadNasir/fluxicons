@@ -31,7 +31,7 @@ const downloadSpec: AnimationSpec = {
       },
     ],
   },
-  defaultTrigger: "hover",
+  defaultTrigger: "hoverHold",
 };
 
 export default downloadSpec;

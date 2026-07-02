@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import type { AnimationTrigger } from "@/lib/icon-registry";
+import { getIconMetadata, type AnimationTrigger } from "@/lib/icon-registry";
 import { clamp } from "@/lib/utils";
 
 export interface PlaygroundState {
@@ -36,6 +36,16 @@ const TRIGGERS: AnimationTrigger[] = [
   "none",
 ];
 
+/**
+ * The trigger an icon is authored to lead with (mirrored from its
+ * `animation.spec.ts` into the registry). Selecting an icon adopts this, so
+ * e.g. Download starts on `hoverHold`. Falls back to the global default for
+ * unknown slugs.
+ */
+function defaultTriggerFor(slug: string): AnimationTrigger {
+  return getIconMetadata(slug)?.defaultTrigger ?? PLAYGROUND_DEFAULTS.trigger;
+}
+
 /** Parse a state object from URL search params, falling back to defaults. */
 function fromParams(
   params: URLSearchParams,
@@ -46,13 +56,18 @@ function fromParams(
     const parsed = raw === null ? NaN : Number(raw);
     return Number.isFinite(parsed) ? parsed : fallback;
   };
+  const slug = params.get("icon") ?? initial.slug;
   const triggerRaw = params.get("trigger") as AnimationTrigger | null;
   return {
-    slug: params.get("icon") ?? initial.slug,
+    slug,
     size: clamp(num("size", initial.size), 16, 128),
     color: params.get("color") ?? initial.color,
     strokeWidth: clamp(num("strokeWidth", initial.strokeWidth), 0.5, 3),
-    trigger: triggerRaw && TRIGGERS.includes(triggerRaw) ? triggerRaw : initial.trigger,
+    // No explicit trigger in the URL → adopt the icon's authored default.
+    trigger:
+      triggerRaw && TRIGGERS.includes(triggerRaw)
+        ? triggerRaw
+        : defaultTriggerFor(slug),
     speed: clamp(num("speed", initial.speed), 0.1, 3),
     loop: params.get("loop") === "true" ? true : initial.loop,
     delay: clamp(num("delay", initial.delay), 0, 5),
@@ -67,7 +82,10 @@ function toParams(state: PlaygroundState): URLSearchParams {
   if (state.color !== PLAYGROUND_DEFAULTS.color) params.set("color", state.color);
   if (state.strokeWidth !== PLAYGROUND_DEFAULTS.strokeWidth)
     params.set("strokeWidth", String(state.strokeWidth));
-  if (state.trigger !== PLAYGROUND_DEFAULTS.trigger) params.set("trigger", state.trigger);
+  // Only serialize the trigger when it differs from the icon's default, so
+  // default links stay clean and still round-trip to the right trigger.
+  if (state.trigger !== defaultTriggerFor(state.slug))
+    params.set("trigger", state.trigger);
   if (state.speed !== PLAYGROUND_DEFAULTS.speed) params.set("speed", String(state.speed));
   if (state.loop !== PLAYGROUND_DEFAULTS.loop) params.set("loop", "true");
   if (state.delay !== PLAYGROUND_DEFAULTS.delay) params.set("delay", String(state.delay));
@@ -95,6 +113,8 @@ export function usePlaygroundState({
   const searchParams = useSearchParams();
 
   const baseDefaults = { ...PLAYGROUND_DEFAULTS, ...initial };
+  // Unless the caller pinned a trigger, lead with the icon's authored default.
+  if (!initial?.trigger) baseDefaults.trigger = defaultTriggerFor(baseDefaults.slug);
 
   const [state, setState] = useState<PlaygroundState>(() =>
     syncUrl
@@ -122,9 +142,19 @@ export function usePlaygroundState({
     [],
   );
 
-  const reset = useCallback(() => {
-    setState((prev) => ({ ...PLAYGROUND_DEFAULTS, slug: prev.slug }));
+  // Selecting an icon adopts its authored default trigger (e.g. Download →
+  // hoverHold), while keeping the other controls where the user left them.
+  const selectIcon = useCallback((slug: string) => {
+    setState((prev) => ({ ...prev, slug, trigger: defaultTriggerFor(slug) }));
   }, []);
 
-  return { state, setField, reset };
+  const reset = useCallback(() => {
+    setState((prev) => ({
+      ...PLAYGROUND_DEFAULTS,
+      slug: prev.slug,
+      trigger: defaultTriggerFor(prev.slug),
+    }));
+  }, []);
+
+  return { state, setField, selectIcon, reset };
 }

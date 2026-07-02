@@ -65,6 +65,12 @@ export interface IconMetadata {
   description: string;
   /** Describes what the animation does. */
   animationDescription: string;
+  /**
+   * The trigger that best expresses this icon, mirrored from its
+   * `animation.spec.ts`. Injected into the registry by
+   * `scripts/generate-registry.ts` — not authored in `metadata.ts`.
+   */
+  defaultTrigger?: AnimationTrigger;
 }
 
 /**

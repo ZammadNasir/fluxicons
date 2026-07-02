@@ -25,7 +25,7 @@ const clockSpec: AnimationSpec = {
       },
     ],
   },
-  defaultTrigger: "hover",
+  defaultTrigger: "hoverHold",
 };
 
 export default clockSpec;

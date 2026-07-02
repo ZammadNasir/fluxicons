@@ -52,7 +52,7 @@ const externalLinkSpec: AnimationSpec = {
     ],
   },
 
-  defaultTrigger: "hover",
+  defaultTrigger: "hoverHold",
 };
 
 export default externalLinkSpec;

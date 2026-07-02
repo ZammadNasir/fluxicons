@@ -49,7 +49,11 @@ export function IconCard({ icon }: IconCardProps) {
       </button>
 
       <div className="flex h-12 items-center justify-center text-foreground">
-        <IconRenderer slug={icon.slug} size={40} trigger="hover" />
+        <IconRenderer
+          slug={icon.slug}
+          size={40}
+          trigger={icon.defaultTrigger ?? "hover"}
+        />
       </div>
       <span className="text-xs text-foreground-muted transition-colors group-hover:text-foreground">
         {icon.name}

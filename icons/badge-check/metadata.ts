@@ -4,9 +4,9 @@ export const metadata: IconMetadata = {
   name: "BadgeCheck",
   slug: "badge-check",
   category: "Status",
-  tags: ["badge", "check", "verified", "flip", "3d", "success"],
+  tags: ["badge", "check", "verified", "verification", "approved", "success"],
   featured: false,
-  description: "A badge that flips to reveal a checkmark drawing on.",
+  description: "An award badge with a verification checkmark.",
   animationDescription:
-    "The disc flips a full turn in 3D while the checkmark draws itself on.",
+    "The badge gently pops while the checkmark draws itself into place.",
 };

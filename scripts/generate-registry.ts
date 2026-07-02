@@ -71,11 +71,23 @@ ${entries}
 
 function buildManifestFile(slugs: string[]): string {
   const imports = slugs
-    .map((slug) => `import { metadata as ${toCamel(slug)}Meta } from "@/icons/${slug}/metadata";`)
+    .map((slug) => {
+      const c = toCamel(slug);
+      return [
+        `import { metadata as ${c}Meta } from "@/icons/${slug}/metadata";`,
+        `import ${c}Spec from "@/icons/${slug}/animation.spec";`,
+      ].join("\n");
+    })
     .join("\n");
 
+  // `defaultTrigger` lives in the spec (the framework-agnostic source of truth),
+  // so it's merged into each metadata entry here rather than duplicated in
+  // metadata.ts.
   const metaEntries = slugs
-    .map((slug) => `  "${slug}": ${toCamel(slug)}Meta,`)
+    .map((slug) => {
+      const c = toCamel(slug);
+      return `  "${slug}": { ...${c}Meta, defaultTrigger: ${c}Spec.defaultTrigger },`;
+    })
     .join("\n");
 
   const importEntries = slugs

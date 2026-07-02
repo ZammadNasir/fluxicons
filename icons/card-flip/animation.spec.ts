@@ -7,12 +7,13 @@ const cardFlipSpec: AnimationSpec = {
   },
   sequences: {
     // Both elements rotate identically around the card's center, so the whole
-    // card flips forward as one rigid surface (3D rotation around the X axis).
+    // card flips to its back as one rigid surface (3D rotation around the X
+    // axis). A half-turn (0→180) so hoverHold can hold the flipped face.
     trigger: [
       {
         element: "card",
         property: "rotateX",
-        values: [0, 180, 360],
+        values: [0, 180],
         duration: 0.7,
         ease: "easeInOut",
         origin: { x: 12, y: 12 },
@@ -20,14 +21,14 @@ const cardFlipSpec: AnimationSpec = {
       {
         element: "line",
         property: "rotateX",
-        values: [0, 180, 360],
+        values: [0, 180],
         duration: 0.7,
         ease: "easeInOut",
         origin: { x: 12, y: 12 },
       },
     ],
   },
-  defaultTrigger: "hover",
+  defaultTrigger: "hoverHold",
   perspective: 500,
 };
 

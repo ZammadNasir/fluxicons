@@ -4,20 +4,14 @@ import { forwardRef } from "react";
 import { motion, type Variants } from "motion/react";
 import type { IconProps } from "@/lib/icon-registry";
 import { useIconControls } from "@/lib/icons/use-icon-controls";
+import badgeCheckSpec from "./animation.spec";
 import { badgeCheckPaths } from "./paths";
 
 const EASE: [number, number, number, number] = [0.4, 0, 0.2, 1];
 
-const ORIGIN = {
-  transformBox: "view-box",
-  transformOrigin: "12px 12px",
-} as const;
-
 /**
- * BadgeCheck — a badge that flips to reveal a checkmark.
- * Animation: a 3D `rotateY` flip on the whole badge (with perspective) combined
- * with a `pathLength` draw on the checkmark — the draw runs inside the 3D
- * (preserve-3d) context.
+ * BadgeCheck — award badge with a verification check.
+ * Animation: the badge gently pops while the checkmark draws itself into place.
  */
 const BadgeCheck = forwardRef<SVGSVGElement, IconProps>(
   (
@@ -25,7 +19,7 @@ const BadgeCheck = forwardRef<SVGSVGElement, IconProps>(
       size = 24,
       color = "currentColor",
       strokeWidth = 1.5,
-      trigger = "hover",
+      trigger = badgeCheckSpec.defaultTrigger,
       speed = 1,
       loop = false,
       delay = 0,
@@ -33,31 +27,36 @@ const BadgeCheck = forwardRef<SVGSVGElement, IconProps>(
       onAnimationComplete,
       className,
       style,
-      "aria-label": ariaLabel = "BadgeCheck icon",
+      "aria-label": ariaLabel = "Badge check icon",
     },
     ref,
   ) => {
-    const { ref: mergedRef, controls, rootProps } = useIconControls(ref, {
+    const {
+      ref: mergedRef,
+      controls,
+      rootProps,
+    } = useIconControls(ref, {
       trigger,
       onAnimationStart,
       onAnimationComplete,
     });
 
-    const flip: Variants = {
-      normal: { rotateY: 0 },
+    const badge: Variants = {
+      normal: { scale: 1 },
       animate: {
-        rotateY: [0, 360],
+        scale: [1, 1.08, 0.98, 1],
         transition: {
-          duration: 0.8 / speed,
+          duration: 0.5 / speed,
           ease: EASE,
           delay,
           repeat: loop ? Infinity : 0,
+          repeatDelay: loop ? 0.5 / speed : 0,
         },
       },
       hold: {
-        rotateY: [0, 360],
+        scale: [1, 1.08, 0.98],
         transition: {
-          duration: 0.8 / speed,
+          duration: 0.5 / speed,
           ease: EASE,
           delay,
           repeat: 0,
@@ -65,23 +64,26 @@ const BadgeCheck = forwardRef<SVGSVGElement, IconProps>(
       },
     };
 
-    const draw: Variants = {
-      normal: { pathLength: 1 },
+    const check: Variants = {
+      normal: {
+        pathLength: 1,
+      },
       animate: {
         pathLength: [0, 1],
         transition: {
-          duration: 0.5 / speed,
-          ease: "easeOut",
-          delay: delay + 0.3 / speed,
+          duration: 0.4 / speed,
+          ease: EASE,
+          delay,
           repeat: loop ? Infinity : 0,
+          repeatDelay: loop ? 0.5 / speed : 0,
         },
       },
       hold: {
         pathLength: [0, 1],
         transition: {
-          duration: 0.5 / speed,
-          ease: "easeOut",
-          delay: delay + 0.3 / speed,
+          duration: 0.4 / speed,
+          ease: EASE,
+          delay,
           repeat: 0,
         },
       },
@@ -99,21 +101,26 @@ const BadgeCheck = forwardRef<SVGSVGElement, IconProps>(
         strokeLinecap="round"
         strokeLinejoin="round"
         className={className}
-        style={{ ...style, perspective: "600px" }}
+        style={style}
         aria-label={ariaLabel}
         focusable={trigger === "click" ? undefined : false}
         initial="normal"
         animate={controls}
         {...rootProps}
       >
-        <motion.g variants={flip} style={ORIGIN}>
-          <circle
-            id="badge"
-            cx={badgeCheckPaths.badge.cx}
-            cy={badgeCheckPaths.badge.cy}
-            r={badgeCheckPaths.badge.r}
-          />
-          <motion.path id="badge-check-check" d={badgeCheckPaths.check.d} variants={draw} />
+        {/* <motion.path
+          id="badge-check-badge"
+          d={badgeCheckPaths.badge.d}
+          variants={badge}
+        />
+        <motion.path
+          id="badge-check-check"
+          d={badgeCheckPaths.check.d}
+          variants={check}
+        /> */}
+        <motion.g variants={badge}>
+          <path id="badge-check-badge" d={badgeCheckPaths.badge.d} />
+          <path id="badge-check-check" d={badgeCheckPaths.check.d} />
         </motion.g>
       </motion.svg>
     );

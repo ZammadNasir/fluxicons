@@ -32,7 +32,10 @@ export function Playground({
   initial,
   lockIcon = false,
 }: PlaygroundProps) {
-  const { state, setField, reset } = usePlaygroundState({ syncUrl, initial });
+  const { state, setField, selectIcon, reset } = usePlaygroundState({
+    syncUrl,
+    initial,
+  });
 
   // Remount the preview when animation-affecting props change so the
   // animation re-arms from its resting pose.
@@ -57,7 +60,7 @@ export function Playground({
           <div className="max-h-[560px] border-b border-border p-4 lg:max-h-none lg:border-b-0">
             <IconSelector
               selected={state.slug}
-              onSelect={(slug) => setField("slug", slug)}
+              onSelect={selectIcon}
             />
           </div>
         )}
