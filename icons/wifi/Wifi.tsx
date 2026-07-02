@@ -4,19 +4,15 @@ import { forwardRef } from "react";
 import { motion, type Variants } from "motion/react";
 import type { IconProps } from "@/lib/icon-registry";
 import { useIconControls } from "@/lib/icons/use-icon-controls";
-import { downloadPaths } from "./paths";
+import { wifiPaths } from "./paths";
 
 const EASE: [number, number, number, number] = [0.4, 0, 0.2, 1];
-const CENTER = {
-  transformBox: "view-box",
-  transformOrigin: "12px 12px",
-} as const;
 
 /**
- * Download — downward arrow above a tray.
- * Animation: the arrow drops into the tray, which compresses slightly before both settle.
+ * Wifi — wireless signal arcs with a connection point.
+ * Animation: the wifi signal bars fill in and disappear in sequence before returning.
  */
-const Download = forwardRef<SVGSVGElement, IconProps>(
+const Wifi = forwardRef<SVGSVGElement, IconProps>(
   (
     {
       size = 24,
@@ -30,7 +26,7 @@ const Download = forwardRef<SVGSVGElement, IconProps>(
       onAnimationComplete,
       className,
       style,
-      "aria-label": ariaLabel = "Download icon",
+      "aria-label": ariaLabel = "Wifi icon",
     },
     ref,
   ) => {
@@ -44,12 +40,12 @@ const Download = forwardRef<SVGSVGElement, IconProps>(
       onAnimationComplete,
     });
 
-    const arrow: Variants = {
-      normal: { y: 0 },
+    const outer: Variants = {
+      normal: { pathLength: 1 },
       animate: {
-        y: [0, 3, 0],
+        pathLength: [1, 0, 1],
         transition: {
-          duration: 0.55 / speed,
+          duration: 0.6 / speed,
           ease: EASE,
           delay,
           repeat: loop ? Infinity : 0,
@@ -57,9 +53,9 @@ const Download = forwardRef<SVGSVGElement, IconProps>(
         },
       },
       hold: {
-        y: [0, 3],
+        pathLength: [1, 0],
         transition: {
-          duration: 0.55 / speed,
+          duration: 0.6 / speed,
           ease: EASE,
           delay,
           repeat: 0,
@@ -67,24 +63,47 @@ const Download = forwardRef<SVGSVGElement, IconProps>(
       },
     };
 
-    const tray: Variants = {
-      normal: { scaleX: 1 },
+    const middle: Variants = {
+      normal: { pathLength: 1 },
       animate: {
-        scaleX: [1, 1.08, 1],
+        pathLength: [1, 0, 1],
         transition: {
-          duration: 0.25 / speed,
+          duration: 0.6 / speed,
           ease: EASE,
-          delay: delay + 0.3 / speed,
+          delay: delay + 0.1 / speed,
           repeat: loop ? Infinity : 0,
-          repeatDelay: loop ? 0.8 / speed : 0,
+          repeatDelay: loop ? 0.5 / speed : 0,
         },
       },
       hold: {
-        scaleX: [1, 1.08],
+        pathLength: [1, 0],
         transition: {
-          duration: 0.25 / speed,
+          duration: 0.6 / speed,
           ease: EASE,
-          delay: delay + 0.3 / speed,
+          delay: delay + 0.1 / speed,
+          repeat: 0,
+        },
+      },
+    };
+
+    const inner: Variants = {
+      normal: { opacity: 1 },
+      animate: {
+        opacity: [1, 0, 1],
+        transition: {
+          duration: 0.6 / speed,
+          ease: EASE,
+          delay: delay + 0.2 / speed,
+          repeat: loop ? Infinity : 0,
+          repeatDelay: loop ? 0.5 / speed : 0,
+        },
+      },
+      hold: {
+        opacity: [1, 0],
+        transition: {
+          duration: 0.6 / speed,
+          ease: EASE,
+          delay: delay + 0.2 / speed,
           repeat: 0,
         },
       },
@@ -109,26 +128,17 @@ const Download = forwardRef<SVGSVGElement, IconProps>(
         animate={controls}
         {...rootProps}
       >
+        <motion.path id="wifi-outer" d={wifiPaths.outer.d} variants={outer} />
         <motion.path
-          id="download-shaft"
-          d={downloadPaths.shaft.d}
-          variants={arrow}
+          id="wifi-middle"
+          d={wifiPaths.middle.d}
+          variants={middle}
         />
-        <motion.path
-          id="download-arrowhead"
-          d={downloadPaths.arrowhead.d}
-          variants={arrow}
-        />
-        <motion.path
-          id="download-tray"
-          d={downloadPaths.tray.d}
-          variants={tray}
-          style={CENTER}
-        />
+        <motion.path id="wifi-inner" d={wifiPaths.inner.d} variants={inner} />
       </motion.svg>
     );
   },
 );
 
-Download.displayName = "Download";
-export default Download;
+Wifi.displayName = "Wifi";
+export default Wifi;

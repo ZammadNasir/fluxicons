@@ -3,9 +3,10 @@ import type { IconMetadata } from "@/lib/icon-registry";
 export const metadata: IconMetadata = {
   name: "Download",
   slug: "download",
-  category: "Interface",
-  tags: ["download", "save", "import", "arrow", "export"],
+  category: "Actions",
+  tags: ["download", "save", "arrow", "file", "import"],
   featured: false,
-  description: "A download arrow with a baseline tray.",
-  animationDescription: "The arrow dips down and bounces back while the baseline pulses.",
+  description: "A downward arrow landing into a download tray.",
+  animationDescription:
+    "The arrow drops into the tray, which compresses slightly before both settle.",
 };

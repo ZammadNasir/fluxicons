@@ -32,15 +32,24 @@ import { metadata as externalLinkMeta } from "@/icons/external-link/metadata";
 import { heartPaths } from "@/icons/heart/paths";
 import heartSpec from "@/icons/heart/animation.spec";
 import { metadata as heartMeta } from "@/icons/heart/metadata";
+import { helpPaths } from "@/icons/help/paths";
+import helpSpec from "@/icons/help/animation.spec";
+import { metadata as helpMeta } from "@/icons/help/metadata";
 import { loaderPaths } from "@/icons/loader/paths";
 import loaderSpec from "@/icons/loader/animation.spec";
 import { metadata as loaderMeta } from "@/icons/loader/metadata";
+import { refreshPaths } from "@/icons/refresh/paths";
+import refreshSpec from "@/icons/refresh/animation.spec";
+import { metadata as refreshMeta } from "@/icons/refresh/metadata";
 import { searchPaths } from "@/icons/search/paths";
 import searchSpec from "@/icons/search/animation.spec";
 import { metadata as searchMeta } from "@/icons/search/metadata";
 import { userPaths } from "@/icons/user/paths";
 import userSpec from "@/icons/user/animation.spec";
 import { metadata as userMeta } from "@/icons/user/metadata";
+import { wifiPaths } from "@/icons/wifi/paths";
+import wifiSpec from "@/icons/wifi/animation.spec";
+import { metadata as wifiMeta } from "@/icons/wifi/metadata";
 
 /** Every icon's framework-agnostic source (pure data — no React). */
 export const ICON_SOURCES: Record<string, IconSource> = {
@@ -54,7 +63,10 @@ export const ICON_SOURCES: Record<string, IconSource> = {
   "download": { paths: downloadPaths, spec: downloadSpec, metadata: downloadMeta },
   "external-link": { paths: externalLinkPaths, spec: externalLinkSpec, metadata: externalLinkMeta },
   "heart": { paths: heartPaths, spec: heartSpec, metadata: heartMeta },
+  "help": { paths: helpPaths, spec: helpSpec, metadata: helpMeta },
   "loader": { paths: loaderPaths, spec: loaderSpec, metadata: loaderMeta },
+  "refresh": { paths: refreshPaths, spec: refreshSpec, metadata: refreshMeta },
   "search": { paths: searchPaths, spec: searchSpec, metadata: searchMeta },
   "user": { paths: userPaths, spec: userSpec, metadata: userMeta },
+  "wifi": { paths: wifiPaths, spec: wifiSpec, metadata: wifiMeta },
 };

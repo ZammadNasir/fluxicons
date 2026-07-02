@@ -4,7 +4,7 @@ import { forwardRef } from "react";
 import { motion, type Variants } from "motion/react";
 import type { IconProps } from "@/lib/icon-registry";
 import { useIconControls } from "@/lib/icons/use-icon-controls";
-import { downloadPaths } from "./paths";
+import { helpPaths } from "./paths";
 
 const EASE: [number, number, number, number] = [0.4, 0, 0.2, 1];
 const CENTER = {
@@ -13,10 +13,10 @@ const CENTER = {
 } as const;
 
 /**
- * Download — downward arrow above a tray.
- * Animation: the arrow drops into the tray, which compresses slightly before both settle.
+ * Help — a circled question mark.
+ * Animation: the question mark gently pops while its dot bounces upward before settling.
  */
-const Download = forwardRef<SVGSVGElement, IconProps>(
+const Help = forwardRef<SVGSVGElement, IconProps>(
   (
     {
       size = 24,
@@ -30,7 +30,7 @@ const Download = forwardRef<SVGSVGElement, IconProps>(
       onAnimationComplete,
       className,
       style,
-      "aria-label": ariaLabel = "Download icon",
+      "aria-label": ariaLabel = "Help icon",
     },
     ref,
   ) => {
@@ -44,10 +44,10 @@ const Download = forwardRef<SVGSVGElement, IconProps>(
       onAnimationComplete,
     });
 
-    const arrow: Variants = {
-      normal: { y: 0 },
+    const question: Variants = {
+      normal: { scale: 1 },
       animate: {
-        y: [0, 3, 0],
+        scale: [1, 1.12, 0.96, 1.06, 1],
         transition: {
           duration: 0.55 / speed,
           ease: EASE,
@@ -57,7 +57,7 @@ const Download = forwardRef<SVGSVGElement, IconProps>(
         },
       },
       hold: {
-        y: [0, 3],
+        scale: [1, 1.12, 0.96, 1.06],
         transition: {
           duration: 0.55 / speed,
           ease: EASE,
@@ -67,24 +67,24 @@ const Download = forwardRef<SVGSVGElement, IconProps>(
       },
     };
 
-    const tray: Variants = {
-      normal: { scaleX: 1 },
+    const dot: Variants = {
+      normal: { y: 0 },
       animate: {
-        scaleX: [1, 1.08, 1],
+        y: [0, -1.5, 0],
         transition: {
-          duration: 0.25 / speed,
+          duration: 0.55 / speed,
           ease: EASE,
-          delay: delay + 0.3 / speed,
+          delay,
           repeat: loop ? Infinity : 0,
-          repeatDelay: loop ? 0.8 / speed : 0,
+          repeatDelay: loop ? 0.5 / speed : 0,
         },
       },
       hold: {
-        scaleX: [1, 1.08],
+        y: [0, -1.5],
         transition: {
-          duration: 0.25 / speed,
+          duration: 0.55 / speed,
           ease: EASE,
-          delay: delay + 0.3 / speed,
+          delay,
           repeat: 0,
         },
       },
@@ -109,26 +109,18 @@ const Download = forwardRef<SVGSVGElement, IconProps>(
         animate={controls}
         {...rootProps}
       >
+        <path id="help-circle" d={helpPaths.circle.d} />
         <motion.path
-          id="download-shaft"
-          d={downloadPaths.shaft.d}
-          variants={arrow}
-        />
-        <motion.path
-          id="download-arrowhead"
-          d={downloadPaths.arrowhead.d}
-          variants={arrow}
-        />
-        <motion.path
-          id="download-tray"
-          d={downloadPaths.tray.d}
-          variants={tray}
+          id="help-question"
+          d={helpPaths.question.d}
+          variants={question}
           style={CENTER}
         />
+        <motion.path id="help-dot" d={helpPaths.dot.d} variants={dot} />
       </motion.svg>
     );
   },
 );
 
-Download.displayName = "Download";
-export default Download;
+Help.displayName = "Help";
+export default Help;

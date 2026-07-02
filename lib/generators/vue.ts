@@ -1,4 +1,8 @@
-import type { AnimationSpec, AnimationStep, IconPaths } from "@/lib/animation-spec";
+import type {
+  AnimationSpec,
+  AnimationStep,
+  IconPaths,
+} from "@/lib/animation-spec";
 import type { IconMetadata } from "@/lib/icon-registry";
 import { toPascalCase } from "@/lib/utils";
 import {
@@ -39,7 +43,8 @@ function kebab(name: string): string {
 
 function buildUsageAttributes(input: GeneratorInput): string[] {
   const attrs: string[] = [];
-  if (input.size !== DEFAULT_ICON_PROPS.size) attrs.push(`:size="${input.size}"`);
+  if (input.size !== DEFAULT_ICON_PROPS.size)
+    attrs.push(`:size="${input.size}"`);
   if (input.color !== DEFAULT_ICON_PROPS.color) {
     attrs.push(`color="${resolveColor(input.color)}"`);
   }
@@ -49,11 +54,13 @@ function buildUsageAttributes(input: GeneratorInput): string[] {
   if (input.trigger !== DEFAULT_ICON_PROPS.trigger) {
     attrs.push(`trigger="${input.trigger}"`);
   }
-  if (input.speed !== DEFAULT_ICON_PROPS.speed) attrs.push(`:speed="${input.speed}"`);
+  if (input.speed !== DEFAULT_ICON_PROPS.speed)
+    attrs.push(`:speed="${input.speed}"`);
   if (input.loop !== DEFAULT_ICON_PROPS.loop) {
     attrs.push(input.loop ? "loop" : ':loop="false"');
   }
-  if (input.delay !== DEFAULT_ICON_PROPS.delay) attrs.push(`:delay="${input.delay}"`);
+  if (input.delay !== DEFAULT_ICON_PROPS.delay)
+    attrs.push(`:delay="${input.delay}"`);
   return attrs;
 }
 
@@ -129,17 +136,31 @@ function cssFrameValue(step: AnimationStep, value: number): string {
   }
 }
 
+/** Which keyframe pose a step is being emitted for. */
+type StepVariant = "normal" | "holdIn" | "holdOut";
+
 /**
  * Emit the `@keyframes` block + class for a single animation step. Timing
  * (duration, delay, iteration count) is bound inline via `stepStyle()` so the
  * `speed`, `delay`, and `loop` props can drive it at runtime.
+ *
+ * `variant` selects the pose: `normal` is the full round-trip used by
+ * hover/click/inView/autoplay; the `hold*` poses back the `hoverHold` trigger —
+ * `holdIn` drops the trailing return-to-rest frame so the icon settles at its
+ * peak and stays there, and `holdOut` plays that in reverse (peak → rest) when
+ * the pointer leaves.
  */
 function buildStepCss(
   step: AnimationStep,
   className: string,
   preserve3D: boolean,
+  variant: StepVariant = "normal",
 ): string {
-  const values = stepValues(step);
+  let values = stepValues(step);
+  const roundTrip =
+    values.length > 1 && values[0] === values[values.length - 1];
+  if (variant !== "normal" && roundTrip) values = values.slice(0, -1);
+  if (variant === "holdOut") values = [...values].reverse();
   const percents = distributePercentages(values.length);
   const frames = values
     .map((v, i) => `  ${percents[i]}% { ${cssFrameValue(step, v)} }`)
@@ -174,6 +195,25 @@ function vueStepStyleBinding(step: AnimationStep, alwaysLoop: boolean): string {
   return `:style="stepStyle(${step.duration}, ${step.delay ?? 0}, ${alwaysLoop})"`;
 }
 
+/**
+ * Emit every keyframe pose a step can be driven with at runtime: the `normal`
+ * round-trip (hover/click/inView/autoplay) plus the `hoverHold` poses
+ * (`-hold` = rest → peak held, `-hold-out` = peak → rest on leave). The runtime
+ * `stepCls()` helper picks the right one from the live `trigger` prop, so a
+ * shipped component behaves correctly for whatever `trigger` a consumer passes —
+ * not just the one it was generated with.
+ */
+function pushStepVariants(
+  cssBlocks: string[],
+  step: AnimationStep,
+  base: string,
+  preserve3D: boolean,
+): void {
+  cssBlocks.push(buildStepCss(step, base, preserve3D, "normal"));
+  cssBlocks.push(buildStepCss(step, `${base}-hold`, preserve3D, "holdIn"));
+  cssBlocks.push(buildStepCss(step, `${base}-hold-out`, preserve3D, "holdOut"));
+}
+
 /** Render one element (with its animation wrappers) and collect its CSS. */
 function renderVueElement(
   elementKey: string,
@@ -201,9 +241,9 @@ function renderVueElement(
   const draw = steps.find((s) => s.step.property === "pathLength");
   let shapeAttrs = ` id="${id}"`;
   if (draw) {
-    const className = `flux-${id}-draw`;
-    cssBlocks.push(buildStepCss(draw.step, className, preserve3D));
-    shapeAttrs += ` pathLength="1" :class="{ '${className}': isAnimating }" ${vueStepStyleBinding(draw.step, draw.alwaysLoop)}`;
+    const base = `flux-${id}-draw`;
+    pushStepVariants(cssBlocks, draw.step, base, preserve3D);
+    shapeAttrs += ` pathLength="1" :class="stepCls('${base}')" ${vueStepStyleBinding(draw.step, draw.alwaysLoop)}`;
   }
 
   let markup = renderSvgElement(data, shapeAttrs);
@@ -212,9 +252,9 @@ function renderVueElement(
   for (const { step, alwaysLoop } of steps.filter(
     (s) => s.step.property !== "pathLength",
   )) {
-    const className = `flux-${id}-${step.property.toLowerCase()}`;
-    cssBlocks.push(buildStepCss(step, className, preserve3D));
-    markup = `<g :class="{ '${className}': isAnimating }" ${vueStepStyleBinding(step, alwaysLoop)}>\n        ${markup.split("\n").join("\n        ")}\n      </g>`;
+    const base = `flux-${id}-${step.property.toLowerCase()}`;
+    pushStepVariants(cssBlocks, step, base, preserve3D);
+    markup = `<g :class="stepCls('${base}')" ${vueStepStyleBinding(step, alwaysLoop)}>\n        ${markup.split("\n").join("\n        ")}\n      </g>`;
   }
 
   return markup;
@@ -224,7 +264,7 @@ const VUE_PROPS_BLOCK = `interface Props {
   size?:        number
   color?:       string
   strokeWidth?: number
-  trigger?:     'hover' | 'click' | 'inView' | 'autoplay' | 'none'
+  trigger?:     'hover' | 'hoverHold' | 'click' | 'inView' | 'autoplay' | 'none'
   speed?:       number
   loop?:        boolean
   delay?:       number
@@ -245,7 +285,8 @@ export const vueGenerator: IconGenerator = {
     const name = componentName(meta.slug);
     const p = config?.props ?? {};
     const size = p.size ?? DEFAULT_ICON_PROPS.size;
-    const color = p.color === "currentColor" || !p.color ? "currentColor" : p.color;
+    const color =
+      p.color === "currentColor" || !p.color ? "currentColor" : p.color;
     const strokeWidth = p.strokeWidth ?? DEFAULT_ICON_PROPS.strokeWidth;
     const trigger = p.trigger ?? spec.defaultTrigger;
     const speed = p.speed ?? DEFAULT_ICON_PROPS.speed;
@@ -286,18 +327,35 @@ const props = withDefaults(defineProps<Props>(), {
 
 const rootRef = ref<SVGSVGElement | null>(null)
 const isAnimating = ref(${autoStart ? "true" : "false"})
+// hoverHold pose: 'idle' (rest) → 'in' (settles at peak, holds) → 'out' (returns).
+const holdPhase = ref<'idle' | 'in' | 'out'>('idle')
 
 /**
  * Inline timing for one animation step, reacting to the speed/delay/loop props.
  * \`alwaysLoop\` is true for continuous/repeating steps that must loop no matter
- * what the \`loop\` prop is.
+ * what the \`loop\` prop is. \`hoverHold\` never loops — it settles and holds.
  */
 function stepStyle(duration: number, stepDelay: number, alwaysLoop: boolean) {
+  const loop = props.trigger !== 'hoverHold' && (alwaysLoop || props.loop)
   return {
     animationDuration: \`\${duration / props.speed}s\`,
     animationDelay: \`\${(stepDelay + props.delay) / props.speed}s\`,
-    animationIterationCount: alwaysLoop || props.loop ? 'infinite' : '1',
+    animationIterationCount: loop ? 'infinite' : '1',
   }
+}
+
+/**
+ * Which keyframe class an element's wrapper wears right now. \`hoverHold\` drives
+ * the \`-hold\`/\`-hold-out\` poses off \`holdPhase\`; every other trigger toggles the
+ * round-trip class with \`isAnimating\`.
+ */
+function stepCls(base: string) {
+  if (props.trigger === 'hoverHold') {
+    if (holdPhase.value === 'in') return { [\`\${base}-hold\`]: true }
+    if (holdPhase.value === 'out') return { [\`\${base}-hold-out\`]: true }
+    return {}
+  }
+  return isAnimating.value ? { [base]: true } : {}
 }
 
 function play() {
@@ -318,6 +376,11 @@ function handleClick() {
 
 function handleEnter() {
   if (props.trigger === 'hover') play()
+  else if (props.trigger === 'hoverHold') holdPhase.value = 'in'
+}
+
+function handleLeave() {
+  if (props.trigger === 'hoverHold' && holdPhase.value !== 'idle') holdPhase.value = 'out'
 }
 
 let observer: IntersectionObserver | null = null
@@ -356,6 +419,7 @@ onUnmounted(() => observer?.disconnect())
     role="img"
     aria-label="${meta.name} icon"${perspectiveAttr}
     @mouseenter="handleEnter"
+    @mouseleave="handleLeave"
     @click="handleClick"
   >
       ${body}

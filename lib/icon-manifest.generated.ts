@@ -13,9 +13,12 @@ import { metadata as doorMeta } from "@/icons/door/metadata";
 import { metadata as downloadMeta } from "@/icons/download/metadata";
 import { metadata as externalLinkMeta } from "@/icons/external-link/metadata";
 import { metadata as heartMeta } from "@/icons/heart/metadata";
+import { metadata as helpMeta } from "@/icons/help/metadata";
 import { metadata as loaderMeta } from "@/icons/loader/metadata";
+import { metadata as refreshMeta } from "@/icons/refresh/metadata";
 import { metadata as searchMeta } from "@/icons/search/metadata";
 import { metadata as userMeta } from "@/icons/user/metadata";
+import { metadata as wifiMeta } from "@/icons/wifi/metadata";
 
 /** Metadata for every icon, keyed by slug. */
 export const ICON_METADATA: Record<string, IconMetadata> = {
@@ -29,9 +32,12 @@ export const ICON_METADATA: Record<string, IconMetadata> = {
   "download": downloadMeta,
   "external-link": externalLinkMeta,
   "heart": heartMeta,
+  "help": helpMeta,
   "loader": loaderMeta,
+  "refresh": refreshMeta,
   "search": searchMeta,
   "user": userMeta,
+  "wifi": wifiMeta,
 };
 
 /** Lazy component loaders keyed by slug (one chunk per icon). */
@@ -49,7 +55,10 @@ export const ICON_IMPORTS: Record<
   "download": () => import("@/icons/download"),
   "external-link": () => import("@/icons/external-link"),
   "heart": () => import("@/icons/heart"),
+  "help": () => import("@/icons/help"),
   "loader": () => import("@/icons/loader"),
+  "refresh": () => import("@/icons/refresh"),
   "search": () => import("@/icons/search"),
   "user": () => import("@/icons/user"),
+  "wifi": () => import("@/icons/wifi"),
 };
