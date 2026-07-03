@@ -8,50 +8,41 @@ var import_node_readline = require("node:readline");
 
 // icons/badge-check/paths.ts
 var badgeCheckPaths = {
-  badge: { type: "circle", cx: 12, cy: 12, r: 9 },
-  check: { type: "path", d: "M8 12.5l2.5 2.5L16 9" }
+  badge: {
+    type: "path",
+    d: "M12 3l2.1 1.2 2.4-.3 1.2 2.1 2.1 1.2-.3 2.4L21 12l-1.2 2.1.3 2.4-2.1 1.2-1.2 2.1-2.4-.3L12 21l-2.1-1.2-2.4.3-1.2-2.1-2.1-1.2.3-2.4L3 12l1.2-2.1-.3-2.4 2.1-1.2 1.2-2.1 2.4.3L12 3"
+  },
+  check: {
+    type: "path",
+    d: "M9 12.5l2 2 4-4"
+  }
 };
 
 // icons/badge-check/animation.spec.ts
 var badgeCheckSpec = {
   elements: {
-    badge: { id: "badge", description: "The badge disc that flips in 3D." },
-    check: { id: "badge-check-check", description: "The checkmark that draws on." }
+    badge: { id: "badge-check-badge", description: "Award badge" },
+    check: { id: "badge-check-check", description: "Verification checkmark" }
   },
   sequences: {
-    // The disc flips a full turn around the Y axis (coin flip). The checkmark
-    // flips with it AND draws itself on — so its path sits inside a 3D wrapper
-    // (preserve-3d) while also running a pathLength draw.
     trigger: [
       {
         element: "badge",
-        property: "rotateY",
-        values: [0, 360],
-        duration: 0.8,
-        ease: "easeInOut",
-        origin: { x: 12, y: 12 }
-      },
-      {
-        element: "check",
-        property: "rotateY",
-        values: [0, 360],
-        duration: 0.8,
-        ease: "easeInOut",
-        origin: { x: 12, y: 12 }
+        property: "scale",
+        values: [1, 1.08, 0.98, 1],
+        duration: 0.5,
+        ease: "easeInOut"
       },
       {
         element: "check",
         property: "pathLength",
-        from: 0,
-        to: 1,
-        duration: 0.5,
-        delay: 0.3,
-        ease: "easeOut"
+        values: [0, 1],
+        duration: 0.4,
+        ease: "easeInOut"
       }
     ]
   },
-  defaultTrigger: "hover",
-  perspective: 600
+  defaultTrigger: "hover"
 };
 var animation_spec_default = badgeCheckSpec;
 
@@ -60,10 +51,10 @@ var metadata = {
   name: "BadgeCheck",
   slug: "badge-check",
   category: "Status",
-  tags: ["badge", "check", "verified", "flip", "3d", "success"],
+  tags: ["badge", "check", "verified", "verification", "approved", "success"],
   featured: false,
-  description: "A badge that flips to reveal a checkmark drawing on.",
-  animationDescription: "The disc flips a full turn in 3D while the checkmark draws itself on."
+  description: "An award badge with a verification checkmark.",
+  animationDescription: "The badge gently pops while the checkmark draws itself into place."
 };
 
 // icons/ball/paths.ts
@@ -184,12 +175,13 @@ var cardFlipSpec = {
   },
   sequences: {
     // Both elements rotate identically around the card's center, so the whole
-    // card flips forward as one rigid surface (3D rotation around the X axis).
+    // card flips to its back as one rigid surface (3D rotation around the X
+    // axis). A half-turn (0→180) so hoverHold can hold the flipped face.
     trigger: [
       {
         element: "card",
         property: "rotateX",
-        values: [0, 180, 360],
+        values: [0, 180],
         duration: 0.7,
         ease: "easeInOut",
         origin: { x: 12, y: 12 }
@@ -197,14 +189,14 @@ var cardFlipSpec = {
       {
         element: "line",
         property: "rotateX",
-        values: [0, 180, 360],
+        values: [0, 180],
         duration: 0.7,
         ease: "easeInOut",
         origin: { x: 12, y: 12 }
       }
     ]
   },
-  defaultTrigger: "hover",
+  defaultTrigger: "hoverHold",
   perspective: 500
 };
 var animation_spec_default4 = cardFlipSpec;
@@ -217,7 +209,7 @@ var metadata4 = {
   tags: ["card", "flip", "rotate", "3d", "reveal"],
   featured: false,
   description: "A card that flips forward to reveal its other side.",
-  animationDescription: "The card rotates a full turn around its horizontal axis (a 3D flip)."
+  animationDescription: "The card flips to its back around its horizontal axis (a 3D half-turn), holding the flipped face while hovered."
 };
 
 // icons/check/paths.ts
@@ -300,7 +292,7 @@ var clockSpec = {
       }
     ]
   },
-  defaultTrigger: "hover"
+  defaultTrigger: "hoverHold"
 };
 var animation_spec_default6 = clockSpec;
 
@@ -363,7 +355,7 @@ var doorSpec = {
       }
     ]
   },
-  defaultTrigger: "hover",
+  defaultTrigger: "hoverHold",
   perspective: 500
 };
 var animation_spec_default7 = doorSpec;
@@ -381,36 +373,44 @@ var metadata7 = {
 
 // icons/download/paths.ts
 var downloadPaths = {
-  // Arrow shaft + head as a single two-subpath stroke.
-  arrow: { type: "path", d: "M12 3v12 M7 10l5 5 5-5" },
-  baseline: { type: "path", d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" }
+  shaft: { type: "path", d: "M12 3v11" },
+  arrowhead: { type: "path", d: "m8 10 4 4 4-4" },
+  tray: { type: "path", d: "M4 19h16" }
 };
 
 // icons/download/animation.spec.ts
 var downloadSpec = {
   elements: {
-    arrow: { id: "download-arrow", description: "Download arrow" },
-    baseline: { id: "download-baseline", description: "Baseline" }
+    shaft: { id: "download-shaft", description: "Download arrow shaft" },
+    arrowhead: { id: "download-arrowhead", description: "Download arrowhead" },
+    tray: { id: "download-tray", description: "Download tray" }
   },
   sequences: {
     trigger: [
       {
-        element: "arrow",
+        element: "shaft",
         property: "translateY",
         values: [0, 3, 0],
-        duration: 0.4,
+        duration: 0.55,
         ease: "easeInOut"
       },
       {
-        element: "baseline",
-        property: "opacity",
-        values: [1, 0.3, 1],
-        duration: 0.4,
+        element: "arrowhead",
+        property: "translateY",
+        values: [0, 3, 0],
+        duration: 0.55,
+        ease: "easeInOut"
+      },
+      {
+        element: "tray",
+        property: "scaleX",
+        values: [1, 1.08, 1],
+        duration: 0.25,
         ease: "easeInOut"
       }
     ]
   },
-  defaultTrigger: "hover"
+  defaultTrigger: "hoverHold"
 };
 var animation_spec_default8 = downloadSpec;
 
@@ -418,11 +418,143 @@ var animation_spec_default8 = downloadSpec;
 var metadata8 = {
   name: "Download",
   slug: "download",
-  category: "Interface",
-  tags: ["download", "save", "import", "arrow", "export"],
+  category: "Actions",
+  tags: ["download", "save", "arrow", "file", "import"],
   featured: false,
-  description: "A download arrow with a baseline tray.",
-  animationDescription: "The arrow dips down and bounces back while the baseline pulses."
+  description: "A downward arrow landing into a download tray.",
+  animationDescription: "The arrow drops into the tray, which compresses slightly before both settle."
+};
+
+// icons/external-link/paths.ts
+var externalLinkPaths = {
+  box: {
+    type: "path",
+    d: "M13 5H7a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"
+  },
+  arrow: {
+    type: "path",
+    d: "M10 14L20 4"
+  },
+  arrowHead: {
+    type: "path",
+    d: "M15 4h5v5"
+  }
+};
+
+// icons/external-link/animation.spec.ts
+var externalLinkSpec = {
+  elements: {
+    box: {
+      id: "external-link-box",
+      description: "The square representing the destination window."
+    },
+    arrow: {
+      id: "external-link-arrow",
+      description: "The arrow leaving the square."
+    },
+    arrowHead: {
+      id: "external-link-arrow-head",
+      description: "The arrow head pointing outward."
+    }
+  },
+  sequences: {
+    trigger: [
+      // Arrow moves to the top-right
+      {
+        element: "arrow",
+        property: "translateX",
+        values: [0, 1.5, 0],
+        duration: 0.4,
+        ease: "easeInOut"
+      },
+      {
+        element: "arrow",
+        property: "translateY",
+        values: [0, -1.5, 0],
+        duration: 0.4,
+        ease: "easeInOut"
+      },
+      // Arrow head follows
+      {
+        element: "arrowHead",
+        property: "translateX",
+        values: [0, 1.5, 0],
+        duration: 0.4,
+        ease: "easeInOut"
+      },
+      {
+        element: "arrowHead",
+        property: "translateY",
+        values: [0, -1.5, 0],
+        duration: 0.4,
+        ease: "easeInOut"
+      }
+    ]
+  },
+  defaultTrigger: "hoverHold"
+};
+var animation_spec_default9 = externalLinkSpec;
+
+// icons/external-link/metadata.ts
+var metadata9 = {
+  name: "ExternalLink",
+  slug: "external-link",
+  category: "Uncategorized",
+  tags: [],
+  featured: false,
+  description: "TODO: one-line description for ExternalLink.",
+  animationDescription: "TODO: describe what the animation does."
+};
+
+// icons/eye/paths.ts
+var eyePaths = {
+  outline: {
+    type: "path",
+    d: "M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"
+  },
+  pupil: { type: "circle", cx: 12, cy: 12, r: 2.5 },
+  upperLid: { type: "path", d: "M2 12s3.5-7 10-7 10 7 10 7" }
+};
+
+// icons/eye/animation.spec.ts
+var eyeSpec = {
+  elements: {
+    outline: { id: "eye-outline", description: "Eye outline" },
+    pupil: { id: "eye-pupil", description: "Eye pupil" },
+    upperLid: { id: "eye-upperLid", description: "Upper eyelid blink motion" }
+  },
+  sequences: {
+    trigger: [
+      {
+        element: "upperLid",
+        property: "translateY",
+        values: [-6, 0, -6],
+        duration: 0.45,
+        ease: "easeInOut"
+      },
+      {
+        element: "pupil",
+        property: "scale",
+        values: [1, 0.88, 1],
+        duration: 0.45,
+        ease: "easeInOut",
+        origin: { x: 12, y: 12 }
+      }
+    ]
+  },
+  defaultTrigger: "hoverHold"
+};
+var animation_spec_default10 = eyeSpec;
+
+// icons/eye/metadata.ts
+var metadata10 = {
+  name: "Eye",
+  slug: "eye",
+  category: "Visibility",
+  tags: ["eye", "vision", "view", "watch", "visibility", "blink"],
+  featured: false,
+  description: "An eye icon with a natural blinking motion.",
+  animationDescription: "The eye performs a soft blink while the pupil subtly compresses and returns."
 };
 
 // icons/heart/paths.ts
@@ -452,10 +584,10 @@ var heartSpec = {
   },
   defaultTrigger: "hover"
 };
-var animation_spec_default9 = heartSpec;
+var animation_spec_default11 = heartSpec;
 
 // icons/heart/metadata.ts
-var metadata9 = {
+var metadata11 = {
   name: "Heart",
   slug: "heart",
   category: "Social",
@@ -465,44 +597,172 @@ var metadata9 = {
   animationDescription: "A springy heartbeat pulse while the stroke briefly thickens."
 };
 
-// icons/loader/paths.ts
-var loaderPaths = {
-  arc: { type: "path", d: "M21 12a9 9 0 1 1-6.219-8.56" }
+// icons/help/paths.ts
+var helpPaths = {
+  circle: { type: "path", d: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20" },
+  question: {
+    type: "path",
+    d: "M9.5 9a2.5 2.5 0 1 1 4.3 1.7c-.9.8-1.8 1.3-1.8 2.8"
+  },
+  dot: { type: "path", d: "M12 17h.01" }
 };
 
-// icons/loader/animation.spec.ts
-var loaderSpec = {
+// icons/help/animation.spec.ts
+var helpSpec = {
   elements: {
-    arc: { id: "loader-arc", description: "Spinning arc" }
+    question: { id: "help-question", description: "Question mark" },
+    dot: { id: "help-dot", description: "Question mark dot" },
+    circle: { id: "help-circle", description: "Outer circle" }
   },
   sequences: {
-    continuous: [
+    trigger: [
+      {
+        element: "question",
+        property: "scale",
+        values: [1, 1.12, 0.96, 1.06, 1],
+        duration: 0.55,
+        ease: "easeInOut",
+        origin: { x: 12, y: 12 }
+      },
+      {
+        element: "dot",
+        property: "translateY",
+        values: [0, -1.5, 0],
+        duration: 0.55,
+        ease: "easeInOut"
+      }
+    ]
+  },
+  defaultTrigger: "hover"
+};
+var animation_spec_default12 = helpSpec;
+
+// icons/help/metadata.ts
+var metadata12 = {
+  name: "Help",
+  slug: "help",
+  category: "Interface",
+  tags: ["help", "question", "support", "faq", "info", "assist"],
+  featured: false,
+  description: "A circled question mark representing help or support.",
+  animationDescription: "The question mark gently pops while its dot bounces upward before settling."
+};
+
+// icons/layers/paths.ts
+var layersPaths = {
+  base: {
+    type: "path",
+    d: "M4 14 12 18 20 14 12 10 4 14Z"
+  },
+  middle: {
+    type: "path",
+    d: "M6 10 12 13 18 10 12 7 6 10Z"
+  },
+  top: {
+    type: "path",
+    d: "M8 6 12 8 16 6 12 4 8 6Z"
+  }
+};
+
+// icons/layers/animation.spec.ts
+var layersSpec = {
+  elements: {
+    base: { id: "layers-base", description: "Bottom layer" },
+    middle: { id: "layers-middle", description: "Middle layer" },
+    top: { id: "layers-top", description: "Top layer" }
+  },
+  sequences: {
+    trigger: [
+      {
+        element: "base",
+        property: "translateY",
+        values: [0, 0, 0],
+        duration: 0.7,
+        ease: "easeInOut"
+      },
+      {
+        element: "middle",
+        property: "translateY",
+        values: [0, -4, 0],
+        duration: 0.7,
+        ease: "easeInOut"
+      },
+      {
+        element: "top",
+        property: "translateY",
+        values: [0, -8, 0],
+        duration: 0.7,
+        ease: "easeInOut"
+      },
+      {
+        element: "middle",
+        property: "scale",
+        values: [1, 1.03, 1],
+        duration: 0.7,
+        ease: "easeInOut"
+      },
+      {
+        element: "top",
+        property: "scale",
+        values: [1, 1.06, 1],
+        duration: 0.7,
+        ease: "easeInOut"
+      }
+    ]
+  },
+  defaultTrigger: "hover"
+};
+var animation_spec_default13 = layersSpec;
+
+// icons/layers/metadata.ts
+var metadata13 = {
+  name: "Layers",
+  slug: "layers",
+  category: "Interface",
+  tags: ["layers", "stack", "sheets", "depth", "arrangement", "structure"],
+  featured: false,
+  description: "A stacked set of layers representing hierarchy or composition.",
+  animationDescription: "The layers subtly separate vertically, with the top layers lifting slightly before re-stacking."
+};
+
+// icons/refresh/paths.ts
+var refreshPaths = {
+  arc: {
+    type: "path",
+    d: "M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6"
+  }
+};
+
+// icons/refresh/animation.spec.ts
+var refreshSpec = {
+  elements: {
+    arc: { id: "refresh-arc", description: "Circular refresh arrow" }
+  },
+  sequences: {
+    trigger: [
       {
         element: "arc",
         property: "rotate",
-        from: 0,
-        to: 360,
-        duration: 1,
-        ease: "linear",
-        repeat: true,
+        values: [0, 120, 240, 360],
+        duration: 0.8,
+        ease: "easeInOut",
         origin: { x: 12, y: 12 }
       }
     ]
   },
-  defaultTrigger: "autoplay",
-  alwaysLoop: true
+  defaultTrigger: "hover"
 };
-var animation_spec_default10 = loaderSpec;
+var animation_spec_default14 = refreshSpec;
 
-// icons/loader/metadata.ts
-var metadata10 = {
-  name: "Loader",
-  slug: "loader",
-  category: "Status",
-  tags: ["loader", "loading", "spinner", "progress", "wait"],
-  featured: true,
-  description: "A spinner for loading and pending states.",
-  animationDescription: "Continuously rotates; hovering doubles the spin speed."
+// icons/refresh/metadata.ts
+var metadata14 = {
+  name: "Refresh",
+  slug: "refresh",
+  category: "Interface",
+  tags: ["refresh", "reload", "sync", "update", "rotate"],
+  featured: false,
+  description: "A circular refresh arrow.",
+  animationDescription: "The refresh arrow spins one full turn around the center."
 };
 
 // icons/search/paths.ts
@@ -551,10 +811,10 @@ var searchSpec = {
   },
   defaultTrigger: "hover"
 };
-var animation_spec_default11 = searchSpec;
+var animation_spec_default15 = searchSpec;
 
 // icons/search/metadata.ts
-var metadata11 = {
+var metadata15 = {
   name: "Search",
   slug: "search",
   category: "Interface",
@@ -562,6 +822,73 @@ var metadata11 = {
   featured: false,
   description: "A magnifying glass for search and discovery.",
   animationDescription: "The lens pulses, then the whole glass jiggles left-right once."
+};
+
+// icons/signal/paths.ts
+var signalPaths = {
+  bar1: { type: "path", d: "M4 18v2" },
+  bar2: { type: "path", d: "M9 14v6" },
+  bar3: { type: "path", d: "M14 10v10" },
+  bar4: { type: "path", d: "M19 6v14" }
+};
+
+// icons/signal/animation.spec.ts
+var signalSpec = {
+  elements: {
+    bar1: { id: "signal-bar1", description: "Signal bar 1 (shortest)" },
+    bar2: { id: "signal-bar2", description: "Signal bar 2" },
+    bar3: { id: "signal-bar3", description: "Signal bar 3" },
+    bar4: { id: "signal-bar4", description: "Signal bar 4 (tallest)" }
+  },
+  sequences: {
+    trigger: [
+      {
+        element: "bar1",
+        property: "scaleY",
+        values: [1, 0.4, 1],
+        duration: 0.4,
+        ease: "easeInOut",
+        origin: { x: 4, y: 20 }
+      },
+      {
+        element: "bar2",
+        property: "scaleY",
+        values: [1, 0.4, 1],
+        duration: 0.5,
+        ease: "easeInOut",
+        origin: { x: 9, y: 20 }
+      },
+      {
+        element: "bar3",
+        property: "scaleY",
+        values: [1, 0.4, 1],
+        duration: 0.6,
+        ease: "easeInOut",
+        origin: { x: 14, y: 20 }
+      },
+      {
+        element: "bar4",
+        property: "scaleY",
+        values: [1, 0.4, 1],
+        duration: 0.7,
+        ease: "easeInOut",
+        origin: { x: 19, y: 20 }
+      }
+    ]
+  },
+  defaultTrigger: "hover"
+};
+var animation_spec_default16 = signalSpec;
+
+// icons/signal/metadata.ts
+var metadata16 = {
+  name: "Signal",
+  slug: "signal",
+  category: "Communication",
+  tags: ["signal", "network", "cellular", "strength", "connection", "wifi"],
+  featured: false,
+  description: "Four ascending signal-strength bars.",
+  animationDescription: "The bars compress and spring back in a staggered cascade, like a pulse sweeping across the signal."
 };
 
 // icons/user/paths.ts
@@ -601,10 +928,10 @@ var userSpec = {
   },
   defaultTrigger: "hover"
 };
-var animation_spec_default12 = userSpec;
+var animation_spec_default17 = userSpec;
 
 // icons/user/metadata.ts
-var metadata12 = {
+var metadata17 = {
   name: "User",
   slug: "user",
   category: "Uncategorized",
@@ -612,6 +939,60 @@ var metadata12 = {
   featured: false,
   description: "TODO: one-line description for User.",
   animationDescription: "TODO: describe what the animation does."
+};
+
+// icons/wifi/paths.ts
+var wifiPaths = {
+  outer: { type: "path", d: "M5 13a11 11 0 0 1 14 0" },
+  middle: { type: "path", d: "M8.5 16.5a6 6 0 0 1 7 0" },
+  inner: { type: "path", d: "M12 20h.01" }
+};
+
+// icons/wifi/animation.spec.ts
+var wifiSpec = {
+  elements: {
+    outer: { id: "wifi-outer", description: "Outer wifi signal arc" },
+    middle: { id: "wifi-middle", description: "Middle wifi signal arc" },
+    inner: { id: "wifi-inner", description: "Wifi signal dot" }
+  },
+  sequences: {
+    trigger: [
+      {
+        element: "inner",
+        property: "opacity",
+        values: [1, 0, 1],
+        duration: 0.6,
+        ease: "easeInOut"
+      },
+      {
+        element: "middle",
+        property: "pathLength",
+        values: [1, 0, 1],
+        duration: 0.6,
+        ease: "easeInOut"
+      },
+      {
+        element: "outer",
+        property: "pathLength",
+        values: [1, 0, 1],
+        duration: 0.6,
+        ease: "easeInOut"
+      }
+    ]
+  },
+  defaultTrigger: "hover"
+};
+var animation_spec_default18 = wifiSpec;
+
+// icons/wifi/metadata.ts
+var metadata18 = {
+  name: "Wifi",
+  slug: "wifi",
+  category: "Connectivity",
+  tags: ["wifi", "wireless", "signal", "network", "connection"],
+  featured: false,
+  description: "A wireless connection icon with animated signal bars.",
+  animationDescription: "The wifi bars fill in and disappear in sequence, creating a signal pulse effect."
 };
 
 // lib/icon-sources.generated.ts
@@ -624,10 +1005,16 @@ var ICON_SOURCES = {
   "clock": { paths: clockPaths, spec: animation_spec_default6, metadata: metadata6 },
   "door": { paths: doorPaths, spec: animation_spec_default7, metadata: metadata7 },
   "download": { paths: downloadPaths, spec: animation_spec_default8, metadata: metadata8 },
-  "heart": { paths: heartPaths, spec: animation_spec_default9, metadata: metadata9 },
-  "loader": { paths: loaderPaths, spec: animation_spec_default10, metadata: metadata10 },
-  "search": { paths: searchPaths, spec: animation_spec_default11, metadata: metadata11 },
-  "user": { paths: userPaths, spec: animation_spec_default12, metadata: metadata12 }
+  "external-link": { paths: externalLinkPaths, spec: animation_spec_default9, metadata: metadata9 },
+  "eye": { paths: eyePaths, spec: animation_spec_default10, metadata: metadata10 },
+  "heart": { paths: heartPaths, spec: animation_spec_default11, metadata: metadata11 },
+  "help": { paths: helpPaths, spec: animation_spec_default12, metadata: metadata12 },
+  "layers": { paths: layersPaths, spec: animation_spec_default13, metadata: metadata13 },
+  "refresh": { paths: refreshPaths, spec: animation_spec_default14, metadata: metadata14 },
+  "search": { paths: searchPaths, spec: animation_spec_default15, metadata: metadata15 },
+  "signal": { paths: signalPaths, spec: animation_spec_default16, metadata: metadata16 },
+  "user": { paths: userPaths, spec: animation_spec_default17, metadata: metadata17 },
+  "wifi": { paths: wifiPaths, spec: animation_spec_default18, metadata: metadata18 }
 };
 
 // lib/icon-sources.ts
@@ -639,10 +1026,6 @@ function listIconSlugs() {
 }
 
 // lib/utils.ts
-function roundTo(value, decimals = 2) {
-  const factor = 10 ** decimals;
-  return Math.round(value * factor) / factor;
-}
 function slugify(input) {
   return input.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 }
@@ -670,13 +1053,6 @@ var DEFAULT_ORIGIN = { x: 12, y: 12 };
 function stepValues(step) {
   if (step.values && step.values.length > 0) return step.values;
   return [step.from ?? 0, step.to ?? 0];
-}
-function distributePercentages(count) {
-  if (count <= 1) return [0];
-  return Array.from(
-    { length: count },
-    (_, i) => roundTo(i / (count - 1) * 100, 2)
-  );
 }
 function allSteps(spec) {
   return [
@@ -724,19 +1100,6 @@ function framerEasing(ease) {
       return `"easeInOut"`;
     case "linear":
       return `"linear"`;
-  }
-}
-function renderSvgElement(data, attrs, selfClose = true) {
-  const end = selfClose ? " />" : ">";
-  switch (data.type) {
-    case "path":
-      return `<path${attrs} d="${data.d}"${end}`;
-    case "circle":
-      return `<circle${attrs} cx="${data.cx}" cy="${data.cy}" r="${data.r}"${end}`;
-    case "line":
-      return `<line${attrs} x1="${data.x1}" y1="${data.y1}" x2="${data.x2}" y2="${data.y2}"${end}`;
-    case "polyline":
-      return `<polyline${attrs} points="${data.points}"${end}`;
   }
 }
 
@@ -847,7 +1210,7 @@ interface ${name}Props {
   size?: number;
   color?: string;
   strokeWidth?: number;
-  trigger?: "hover" | "click" | "inView" | "autoplay" | "none";
+  trigger?: "hover" | "hoverHold" | "click" | "inView" | "autoplay" | "none";
   speed?: number;
 }
 
@@ -900,7 +1263,7 @@ ${elementMarkup.join("\n")}
   }
 };
 
-// lib/generators/vue.ts
+// lib/runtime/compile.ts
 var TRANSFORM_PROPS2 = /* @__PURE__ */ new Set([
   "rotate",
   "rotateX",
@@ -911,99 +1274,140 @@ var TRANSFORM_PROPS2 = /* @__PURE__ */ new Set([
   "translateX",
   "translateY"
 ]);
-function cssFrameValue(step, value) {
-  switch (step.property) {
+function transformValue(property, v) {
+  switch (property) {
     case "rotate":
-      return `transform: rotate(${value}deg);`;
+      return `rotate(${v}deg)`;
     case "rotateX":
-      return `transform: rotateX(${value}deg);`;
+      return `rotateX(${v}deg)`;
     case "rotateY":
-      return `transform: rotateY(${value}deg);`;
+      return `rotateY(${v}deg)`;
     case "scale":
-      return `transform: scale(${value});`;
+      return `scale(${v})`;
     case "scaleX":
-      return `transform: scaleX(${value});`;
+      return `scaleX(${v})`;
     case "scaleY":
-      return `transform: scaleY(${value});`;
+      return `scaleY(${v})`;
     case "translateX":
-      return `transform: translateX(${value}px);`;
+      return `translateX(${v}px)`;
     case "translateY":
-      return `transform: translateY(${value}px);`;
-    case "opacity":
-      return `opacity: ${value};`;
-    case "strokeWidth":
-      return `stroke-width: ${value};`;
-    case "pathLength":
-      return `stroke-dashoffset: ${1 - value};`;
+      return `translateY(${v}px)`;
+    default:
+      return "";
   }
 }
-function buildStepCss(step, className, preserve3D) {
+function keyframeFor(property, v) {
+  if (TRANSFORM_PROPS2.has(property)) return { transform: transformValue(property, v) };
+  if (property === "opacity") return { opacity: v };
+  if (property === "strokeWidth") return { strokeWidth: v };
+  if (property === "pathLength") return { strokeDashoffset: 1 - v };
+  return {};
+}
+function buildKeyframes(step) {
   const values = stepValues(step);
-  const percents = distributePercentages(values.length);
-  const frames = values.map((v, i) => `  ${percents[i]}% { ${cssFrameValue(step, v)} }`).join("\n");
+  const roundTrip = values.length > 1 && values[0] === values[values.length - 1];
+  const holdValues = roundTrip ? values.slice(0, -1) : values;
+  return {
+    active: values.map((v) => keyframeFor(step.property, v)),
+    hold: holdValues.map((v) => keyframeFor(step.property, v))
+  };
+}
+function groupStyle(step, is3D) {
   const origin = step.origin ?? DEFAULT_ORIGIN;
-  const isTransform = TRANSFORM_PROPS2.has(step.property);
-  const isDraw = step.property === "pathLength";
-  const lines = [
-    isTransform ? "  transform-box: view-box;" : null,
-    isTransform ? `  transform-origin: ${origin.x}px ${origin.y}px;` : null,
-    // Keep the 3D rendering context alive down the wrapper chain so the SVG
-    // root's perspective reaches nested 3D rotations.
-    isTransform && preserve3D ? "  transform-style: preserve-3d;" : null,
-    isDraw ? "  stroke-dasharray: 1;" : null,
-    `  animation-name: ${className};`,
-    "  animation-fill-mode: forwards;",
-    `  animation-timing-function: ${cssEasing(step.ease)};`
-  ].filter(Boolean);
-  const keyframes = `@keyframes ${className} {
-${frames}
-}`;
-  const classBlock = `.${className} {
-${lines.join("\n")}
-}`;
-  return `${keyframes}
+  const style = {
+    "transform-box": "view-box",
+    "transform-origin": `${origin.x}px ${origin.y}px`
+  };
+  if (is3D) style["transform-style"] = "preserve-3d";
+  return style;
+}
+function compileSpec(spec, paths) {
+  const continuous = isContinuous(spec);
+  const is3D = uses3DTransform(spec);
+  const animations = [];
+  const elements = [];
+  for (const elementKey of Object.keys(paths)) {
+    const id = spec.elements[elementKey]?.id ?? elementKey;
+    const steps = [
+      ...(spec.sequences.trigger ?? []).filter((s) => s.element === elementKey).map((step) => ({ step, alwaysLoop: Boolean(step.repeat) })),
+      ...(spec.sequences.continuous ?? []).filter((s) => s.element === elementKey).map((step) => ({ step, alwaysLoop: true }))
+    ];
+    const draw = steps.find((s) => s.step.property === "pathLength");
+    let node = {
+      kind: "shape",
+      data: paths[elementKey],
+      id,
+      drawKey: draw ? `${id}-draw` : void 0
+    };
+    if (draw) {
+      const kf = buildKeyframes(draw.step);
+      animations.push({
+        key: `${id}-draw`,
+        active: kf.active,
+        hold: kf.hold,
+        duration: draw.step.duration,
+        delay: draw.step.delay ?? 0,
+        easing: cssEasing(draw.step.ease),
+        alwaysLoop: draw.alwaysLoop
+      });
+    }
+    for (const { step, alwaysLoop } of steps.filter(
+      (s) => s.step.property !== "pathLength"
+    )) {
+      const key = `${id}-${step.property.toLowerCase()}`;
+      const kf = buildKeyframes(step);
+      animations.push({
+        key,
+        active: kf.active,
+        hold: kf.hold,
+        duration: step.duration,
+        delay: step.delay ?? 0,
+        easing: cssEasing(step.ease),
+        alwaysLoop
+      });
+      node = { kind: "group", key, style: groupStyle(step, is3D), child: node };
+    }
+    elements.push(node);
+  }
+  return {
+    elements,
+    animations,
+    continuous,
+    is3D,
+    perspective: is3D ? perspectiveFor(spec) : null
+  };
+}
 
-${classBlock}`;
+// lib/generators/runtime-template.generated.ts
+var FLUX_RUNTIME_TS = '/**\n * FluxIcons animation runtime \u2014 framework-agnostic, dependency-free, and safe to\n * copy into your project. Every generated icon (Vue/Svelte/Angular/Astro) ships\n * its SVG markup with `data-flux` targets plus a compiled `plan`, then calls\n * `animateIcon(root, plan, props)` from here. All trigger behavior lives in this\n * one file, so it is identical across frameworks.\n *\n * This file has no imports on purpose: it is emitted verbatim next to your icons\n * (as `flux-runtime.ts`) so nothing has to be installed. Tweak it freely.\n */\n\n/** What event starts an icon\'s animation. */\nexport type AnimationTrigger =\n  | "hover"\n  | "hoverHold"\n  | "click"\n  | "inView"\n  | "autoplay"\n  | "none";\n\n/** One element\'s compiled animation, keyed by its `data-flux` target. */\nexport interface StepAnimation {\n  /** Matches the `data-flux` attribute on the element this animates. */\n  key: string;\n  /** Full keyframes (round-trip or destination) for hover/click/inView/autoplay. */\n  active: Keyframe[];\n  /** Rest \u2192 peak keyframes for `hoverHold` (the return is the reverse of this). */\n  hold: Keyframe[];\n  /** Base duration in seconds (before the `speed` prop divides it). */\n  duration: number;\n  /** Base delay in seconds (before `speed`; the `delay` prop is added at runtime). */\n  delay: number;\n  /** CSS timing-function string. */\n  easing: string;\n  /** Loops regardless of the `loop` prop (continuous/`repeat` steps). */\n  alwaysLoop: boolean;\n}\n\n/** What the runtime needs from a compiled plan. */\nexport interface RuntimePlan {\n  /** Per-element animations. */\n  animations: StepAnimation[];\n  /** Whether the icon autostarts (continuous specs). */\n  continuous: boolean;\n}\n\n/** The runtime-tunable props that map to the icon\'s public API. */\nexport interface IconRuntimeProps {\n  trigger: AnimationTrigger;\n  speed: number;\n  loop: boolean;\n  delay: number;\n}\n\n/** Handle returned by {@link animateIcon} for prop updates and teardown. */\nexport interface IconController {\n  /** Re-wire for new props (e.g. the playground changing `trigger`). */\n  update(props: IconRuntimeProps): void;\n  /** Remove all listeners/observers and cancel running animations. */\n  destroy(): void;\n}\n\ntype Variant = "active" | "hold";\n\ninterface Bound {\n  anim: StepAnimation;\n  el: Element;\n}\n\n/** Attach the animation runtime to an already-rendered icon root. */\nexport function animateIcon(\n  root: SVGSVGElement,\n  plan: RuntimePlan,\n  initialProps: IconRuntimeProps,\n): IconController {\n  let props = initialProps;\n\n  // Resolve each animation\'s DOM target once.\n  const bound: Bound[] = [];\n  for (const anim of plan.animations) {\n    const el = root.querySelector(`[data-flux="${anim.key}"]`);\n    if (el) bound.push({ anim, el });\n  }\n\n  // The currently-playing Animation per target (for restart/reverse).\n  const current = new Map<string, Animation>();\n  const cleanups: Array<() => void> = [];\n  let observer: IntersectionObserver | null = null;\n\n  function makeAnimation(b: Bound, variant: Variant): Animation {\n    const { anim } = b;\n    const keyframes = variant === "hold" ? anim.hold : anim.active;\n    const loops = variant === "active" && (anim.alwaysLoop || props.loop);\n    return b.el.animate(keyframes, {\n      duration: (anim.duration / props.speed) * 1000,\n      delay: ((anim.delay + props.delay) / props.speed) * 1000,\n      easing: anim.easing,\n      fill: "forwards",\n      iterations: loops ? Infinity : 1,\n    });\n  }\n\n  /** (Re)start a variant on every target, cancelling any in-flight run. */\n  function play(variant: Variant): void {\n    for (const b of bound) {\n      current.get(b.anim.key)?.cancel();\n      current.set(b.anim.key, makeAnimation(b, variant));\n    }\n  }\n\n  /** Reverse the held pose back to rest (smooth, from the current position). */\n  function reverseToRest(): void {\n    for (const b of bound) {\n      const running = current.get(b.anim.key);\n      if (running) running.reverse();\n    }\n  }\n\n  function on(type: string, handler: EventListener): void {\n    root.addEventListener(type, handler);\n    cleanups.push(() => root.removeEventListener(type, handler));\n  }\n\n  /** Tear down listeners/observers and stop animations (keeps final pose). */\n  function teardown(): void {\n    for (const c of cleanups) c();\n    cleanups.length = 0;\n    observer?.disconnect();\n    observer = null;\n  }\n\n  function setup(): void {\n    teardown();\n\n    // Accessibility reflects interactivity and stays in sync with `trigger`.\n    if (props.trigger === "click") {\n      root.setAttribute("role", "button");\n      root.setAttribute("tabindex", "0");\n    } else {\n      root.setAttribute("role", "img");\n      root.removeAttribute("tabindex");\n    }\n\n    // Continuous specs and autoplay start immediately.\n    if (plan.continuous || props.trigger === "autoplay") play("active");\n\n    switch (props.trigger) {\n      case "hover":\n        on("mouseenter", () => play("active"));\n        on("focus", () => play("active"));\n        break;\n      case "hoverHold":\n        on("mouseenter", () => play("hold"));\n        on("mouseleave", () => reverseToRest());\n        on("focus", () => play("hold"));\n        on("blur", () => reverseToRest());\n        break;\n      case "click":\n        on("click", () => play("active"));\n        on("keydown", (e) => {\n          const key = (e as KeyboardEvent).key;\n          if (key === "Enter" || key === " ") {\n            e.preventDefault();\n            play("active");\n          }\n        });\n        break;\n      case "inView":\n        observer = new IntersectionObserver(\n          (entries) => {\n            if (entries.some((entry) => entry.isIntersecting)) {\n              play("active");\n              observer?.disconnect();\n              observer = null;\n            }\n          },\n          { threshold: 0.5 },\n        );\n        observer.observe(root);\n        break;\n    }\n  }\n\n  setup();\n\n  return {\n    update(next: IconRuntimeProps) {\n      props = next;\n      // Reset every target to rest before re-wiring for the new props.\n      for (const a of current.values()) a.cancel();\n      current.clear();\n      setup();\n    },\n    destroy() {\n      teardown();\n      for (const a of current.values()) a.cancel();\n      current.clear();\n    },\n  };\n}\n';
+
+// lib/generators/vue.ts
+var RUNTIME_FILENAME = "flux-runtime";
+function styleAttr(style) {
+  const s = Object.entries(style).map(([k, v]) => `${k}: ${v}`).join("; ");
+  return s ? ` style="${s}"` : "";
 }
-function vueStepStyleBinding(step, alwaysLoop) {
-  return `:style="stepStyle(${step.duration}, ${step.delay ?? 0}, ${alwaysLoop})"`;
-}
-function renderVueElement(elementKey, paths, spec, cssBlocks) {
-  const data = paths[elementKey];
-  const id = spec.elements[elementKey]?.id ?? elementKey;
-  const preserve3D = uses3DTransform(spec);
-  const steps = [
-    ...(spec.sequences.trigger ?? []).filter((s) => s.element === elementKey).map((step) => ({ step, alwaysLoop: Boolean(step.repeat) })),
-    ...(spec.sequences.continuous ?? []).filter((s) => s.element === elementKey).map((step) => ({ step, alwaysLoop: true }))
-  ];
-  const draw = steps.find((s) => s.step.property === "pathLength");
-  let shapeAttrs = ` id="${id}"`;
-  if (draw) {
-    const className = `flux-${id}-draw`;
-    cssBlocks.push(buildStepCss(draw.step, className, preserve3D));
-    shapeAttrs += ` pathLength="1" :class="{ '${className}': isAnimating }" ${vueStepStyleBinding(draw.step, draw.alwaysLoop)}`;
+function shapeMarkup(node) {
+  const draw = node.drawKey ? ` data-flux="${node.drawKey}" pathLength="1" style="stroke-dasharray: 1"` : "";
+  const d = node.data;
+  switch (d.type) {
+    case "path":
+      return `<path id="${node.id}" d="${d.d}"${draw} />`;
+    case "circle":
+      return `<circle id="${node.id}" cx="${d.cx}" cy="${d.cy}" r="${d.r}"${draw} />`;
+    case "line":
+      return `<line id="${node.id}" x1="${d.x1}" y1="${d.y1}" x2="${d.x2}" y2="${d.y2}"${draw} />`;
+    case "polyline":
+      return `<polyline id="${node.id}" points="${d.points}"${draw} />`;
   }
-  let markup = renderSvgElement(data, shapeAttrs);
-  for (const { step, alwaysLoop } of steps.filter(
-    (s) => s.step.property !== "pathLength"
-  )) {
-    const className = `flux-${id}-${step.property.toLowerCase()}`;
-    cssBlocks.push(buildStepCss(step, className, preserve3D));
-    markup = `<g :class="{ '${className}': isAnimating }" ${vueStepStyleBinding(step, alwaysLoop)}>
-        ${markup.split("\n").join("\n        ")}
-      </g>`;
-  }
-  return markup;
 }
-var VUE_PROPS_BLOCK = `interface Props {
-  size?:        number
-  color?:       string
-  strokeWidth?: number
-  trigger?:     'hover' | 'click' | 'inView' | 'autoplay' | 'none'
-  speed?:       number
-  loop?:        boolean
-  delay?:       number
-}`;
+function nodeMarkup(node, indent) {
+  if (node.kind === "shape") return shapeMarkup(node);
+  const child = nodeMarkup(node.child, `${indent}  `);
+  return `<g data-flux="${node.key}"${styleAttr(node.style)}>
+${indent}  ${child}
+${indent}</g>`;
+}
 var vueGenerator = {
   framework: "vue",
   displayName: "Vue 3",
@@ -1018,22 +1422,29 @@ var vueGenerator = {
     const speed = p.speed ?? DEFAULT_ICON_PROPS.speed;
     const loop = p.loop ?? DEFAULT_ICON_PROPS.loop;
     const delay = p.delay ?? DEFAULT_ICON_PROPS.delay;
-    const continuous = isContinuous(spec);
-    const is3D = uses3DTransform(spec);
-    const cssBlocks = [];
-    const body = Object.keys(paths).map((key) => renderVueElement(key, paths, spec, cssBlocks)).join("\n      ");
-    const perspectiveAttr = is3D ? `
-    style="perspective: ${perspectiveFor(spec)}px"` : "";
-    const autoStart = continuous || trigger === "autoplay";
-    const styleBlock = cssBlocks.length > 0 ? `
-
-<style scoped>
-${cssBlocks.join("\n\n")}
-</style>` : "";
+    const runtimeImport = `./${RUNTIME_FILENAME}`;
+    const plan = compileSpec(spec, paths);
+    const body = plan.elements.map((el) => nodeMarkup(el, "      ")).join("\n      ");
+    const perspectiveAttr = plan.perspective != null ? `
+    style="perspective: ${plan.perspective}px"` : "";
+    const runtimePlan = JSON.stringify(
+      { continuous: plan.continuous, animations: plan.animations },
+      null,
+      2
+    );
     const code = `<script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { animateIcon, type RuntimePlan } from '${runtimeImport}'
 
-${VUE_PROPS_BLOCK}
+interface Props {
+  size?:        number
+  color?:       string
+  strokeWidth?: number
+  trigger?:     'hover' | 'hoverHold' | 'click' | 'inView' | 'autoplay' | 'none'
+  speed?:       number
+  loop?:        boolean
+  delay?:       number
+}
 
 const props = withDefaults(defineProps<Props>(), {
   size:        ${size},
@@ -1045,62 +1456,33 @@ const props = withDefaults(defineProps<Props>(), {
   delay:       ${delay},
 })
 
-const rootRef = ref<SVGSVGElement | null>(null)
-const isAnimating = ref(${autoStart ? "true" : "false"})
+// Keyframes + timing compiled from the icon's animation spec. Identical across
+// every framework because they come from the one shared compiler.
+const plan: RuntimePlan = ${runtimePlan}
 
-/**
- * Inline timing for one animation step, reacting to the speed/delay/loop props.
- * \`alwaysLoop\` is true for continuous/repeating steps that must loop no matter
- * what the \`loop\` prop is.
- */
-function stepStyle(duration: number, stepDelay: number, alwaysLoop: boolean) {
+const rootRef = ref<SVGSVGElement | null>(null)
+let controller: ReturnType<typeof animateIcon> | null = null
+
+function runtimeProps() {
   return {
-    animationDuration: \`\${duration / props.speed}s\`,
-    animationDelay: \`\${(stepDelay + props.delay) / props.speed}s\`,
-    animationIterationCount: alwaysLoop || props.loop ? 'infinite' : '1',
+    trigger: props.trigger,
+    speed: props.speed,
+    loop: props.loop,
+    delay: props.delay,
   }
 }
-
-function play() {
-  // Restart the CSS animation: drop the class, let the browser paint at least
-  // one frame without it (a single rAF isn't enough \u2014 Vue's DOM flush and the
-  // re-add can coalesce into the same frame), then re-add it.
-  isAnimating.value = false
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      isAnimating.value = true
-    })
-  })
-}
-
-function handleClick() {
-  if (props.trigger === 'click') play()
-}
-
-function handleEnter() {
-  if (props.trigger === 'hover') play()
-}
-
-let observer: IntersectionObserver | null = null
 
 onMounted(() => {
-  if (props.trigger === 'autoplay'${continuous ? " || true" : ""}) play()
-
-  if (props.trigger === 'inView' && rootRef.value) {
-    observer = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) {
-          play()
-          observer?.disconnect()
-        }
-      },
-      { threshold: 0.5 },
-    )
-    observer.observe(rootRef.value)
-  }
+  if (rootRef.value) controller = animateIcon(rootRef.value, plan, runtimeProps())
 })
 
-onUnmounted(() => observer?.disconnect())
+// Re-wire when an animation-affecting prop changes (e.g. the playground).
+watch(
+  () => [props.trigger, props.speed, props.loop, props.delay],
+  () => controller?.update(runtimeProps()),
+)
+
+onUnmounted(() => controller?.destroy())
 </script>
 
 <template>
@@ -1116,21 +1498,18 @@ onUnmounted(() => observer?.disconnect())
     stroke-linejoin="round"
     role="img"
     aria-label="${meta.name} icon"${perspectiveAttr}
-    @mouseenter="handleEnter"
-    @click="handleClick"
   >
       ${body}
   </svg>
-</template>${styleBlock}
+</template>
 `;
-    const importStatement = `import ${name} from '@/components/icons/${name}.vue';`;
-    const usageSnippet = `<${name} />`;
     return {
       code,
       fileExtension: "vue",
-      importStatement,
-      usageSnippet,
-      dependencies: "none \u2014 uses CSS animations only"
+      importStatement: `import ${name} from '@/components/icons/${name}.vue';`,
+      usageSnippet: `<${name} />`,
+      dependencies: "none \u2014 self-contained (no npm install)",
+      runtime: { filename: `${RUNTIME_FILENAME}.ts`, code: FLUX_RUNTIME_TS }
     };
   }
 };
@@ -1145,7 +1524,7 @@ function getIconGenerator(framework) {
 }
 
 // cli/index.ts
-var VERSION = true ? "0.1.0-beta.5" : "0.0.0";
+var VERSION = true ? "0.1.0-beta.8" : "0.0.0";
 var supportsColor = process.stdout.isTTY && process.env.NO_COLOR === void 0;
 var paint = (code, s) => supportsColor ? `\x1B[${code}m${s}\x1B[0m` : s;
 var green = (s) => paint("32", s);
@@ -1305,6 +1684,7 @@ async function add(args) {
   const outDir = resolveOutputDir(args.outDir);
   let written = 0;
   let depsNote = "";
+  const runtimesWritten = /* @__PURE__ */ new Set();
   for (const name of args.icons) {
     const slug = slugify(name);
     const source = getIconSource(slug);
@@ -1327,6 +1707,15 @@ async function add(args) {
     console.log(green(`\u2713 ${rel(dest)}`) + dim(`  (${generator.displayName})`));
     written++;
     depsNote = output.dependencies;
+    if (output.runtime && !runtimesWritten.has(output.runtime.filename)) {
+      runtimesWritten.add(output.runtime.filename);
+      const runtimeDest = (0, import_node_path.join)(process.cwd(), outDir, output.runtime.filename);
+      if (!(0, import_node_fs.existsSync)(runtimeDest)) {
+        (0, import_node_fs.mkdirSync)((0, import_node_path.dirname)(runtimeDest), { recursive: true });
+        (0, import_node_fs.writeFileSync)(runtimeDest, output.runtime.code);
+        console.log(green(`\u2713 ${rel(runtimeDest)}`) + dim("  (shared runtime)"));
+      }
+    }
   }
   if (written > 0) {
     console.log();

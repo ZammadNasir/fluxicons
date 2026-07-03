@@ -15,6 +15,8 @@ import { metadata as checkMeta } from "@/icons/check/metadata";
 import checkSpec from "@/icons/check/animation.spec";
 import { metadata as clockMeta } from "@/icons/clock/metadata";
 import clockSpec from "@/icons/clock/animation.spec";
+import { metadata as creatingFileMeta } from "@/icons/creating-file/metadata";
+import creatingFileSpec from "@/icons/creating-file/animation.spec";
 import { metadata as doorMeta } from "@/icons/door/metadata";
 import doorSpec from "@/icons/door/animation.spec";
 import { metadata as downloadMeta } from "@/icons/download/metadata";
@@ -42,24 +44,25 @@ import wifiSpec from "@/icons/wifi/animation.spec";
 
 /** Metadata for every icon, keyed by slug. */
 export const ICON_METADATA: Record<string, IconMetadata> = {
-  "badge-check": { ...badgeCheckMeta, defaultTrigger: badgeCheckSpec.defaultTrigger },
-  "ball": { ...ballMeta, defaultTrigger: ballSpec.defaultTrigger },
-  "bell": { ...bellMeta, defaultTrigger: bellSpec.defaultTrigger },
-  "card-flip": { ...cardFlipMeta, defaultTrigger: cardFlipSpec.defaultTrigger },
-  "check": { ...checkMeta, defaultTrigger: checkSpec.defaultTrigger },
-  "clock": { ...clockMeta, defaultTrigger: clockSpec.defaultTrigger },
-  "door": { ...doorMeta, defaultTrigger: doorSpec.defaultTrigger },
-  "download": { ...downloadMeta, defaultTrigger: downloadSpec.defaultTrigger },
-  "external-link": { ...externalLinkMeta, defaultTrigger: externalLinkSpec.defaultTrigger },
-  "eye": { ...eyeMeta, defaultTrigger: eyeSpec.defaultTrigger },
-  "heart": { ...heartMeta, defaultTrigger: heartSpec.defaultTrigger },
-  "help": { ...helpMeta, defaultTrigger: helpSpec.defaultTrigger },
-  "layers": { ...layersMeta, defaultTrigger: layersSpec.defaultTrigger },
-  "refresh": { ...refreshMeta, defaultTrigger: refreshSpec.defaultTrigger },
-  "search": { ...searchMeta, defaultTrigger: searchSpec.defaultTrigger },
-  "signal": { ...signalMeta, defaultTrigger: signalSpec.defaultTrigger },
-  "user": { ...userMeta, defaultTrigger: userSpec.defaultTrigger },
-  "wifi": { ...wifiMeta, defaultTrigger: wifiSpec.defaultTrigger },
+  "badge-check": { ...badgeCheckMeta, defaultTrigger: badgeCheckSpec.defaultTrigger, defaultLoop: badgeCheckSpec.defaultLoop ?? false },
+  "ball": { ...ballMeta, defaultTrigger: ballSpec.defaultTrigger, defaultLoop: ballSpec.defaultLoop ?? false },
+  "bell": { ...bellMeta, defaultTrigger: bellSpec.defaultTrigger, defaultLoop: bellSpec.defaultLoop ?? false },
+  "card-flip": { ...cardFlipMeta, defaultTrigger: cardFlipSpec.defaultTrigger, defaultLoop: cardFlipSpec.defaultLoop ?? false },
+  "check": { ...checkMeta, defaultTrigger: checkSpec.defaultTrigger, defaultLoop: checkSpec.defaultLoop ?? false },
+  "clock": { ...clockMeta, defaultTrigger: clockSpec.defaultTrigger, defaultLoop: clockSpec.defaultLoop ?? false },
+  "creating-file": { ...creatingFileMeta, defaultTrigger: creatingFileSpec.defaultTrigger, defaultLoop: creatingFileSpec.defaultLoop ?? false },
+  "door": { ...doorMeta, defaultTrigger: doorSpec.defaultTrigger, defaultLoop: doorSpec.defaultLoop ?? false },
+  "download": { ...downloadMeta, defaultTrigger: downloadSpec.defaultTrigger, defaultLoop: downloadSpec.defaultLoop ?? false },
+  "external-link": { ...externalLinkMeta, defaultTrigger: externalLinkSpec.defaultTrigger, defaultLoop: externalLinkSpec.defaultLoop ?? false },
+  "eye": { ...eyeMeta, defaultTrigger: eyeSpec.defaultTrigger, defaultLoop: eyeSpec.defaultLoop ?? false },
+  "heart": { ...heartMeta, defaultTrigger: heartSpec.defaultTrigger, defaultLoop: heartSpec.defaultLoop ?? false },
+  "help": { ...helpMeta, defaultTrigger: helpSpec.defaultTrigger, defaultLoop: helpSpec.defaultLoop ?? false },
+  "layers": { ...layersMeta, defaultTrigger: layersSpec.defaultTrigger, defaultLoop: layersSpec.defaultLoop ?? false },
+  "refresh": { ...refreshMeta, defaultTrigger: refreshSpec.defaultTrigger, defaultLoop: refreshSpec.defaultLoop ?? false },
+  "search": { ...searchMeta, defaultTrigger: searchSpec.defaultTrigger, defaultLoop: searchSpec.defaultLoop ?? false },
+  "signal": { ...signalMeta, defaultTrigger: signalSpec.defaultTrigger, defaultLoop: signalSpec.defaultLoop ?? false },
+  "user": { ...userMeta, defaultTrigger: userSpec.defaultTrigger, defaultLoop: userSpec.defaultLoop ?? false },
+  "wifi": { ...wifiMeta, defaultTrigger: wifiSpec.defaultTrigger, defaultLoop: wifiSpec.defaultLoop ?? false },
 };
 
 /** Lazy component loaders keyed by slug (one chunk per icon). */
@@ -73,6 +76,7 @@ export const ICON_IMPORTS: Record<
   "card-flip": () => import("@/icons/card-flip"),
   "check": () => import("@/icons/check"),
   "clock": () => import("@/icons/clock"),
+  "creating-file": () => import("@/icons/creating-file"),
   "door": () => import("@/icons/door"),
   "download": () => import("@/icons/download"),
   "external-link": () => import("@/icons/external-link"),

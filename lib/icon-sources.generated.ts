@@ -20,6 +20,9 @@ import { metadata as checkMeta } from "@/icons/check/metadata";
 import { clockPaths } from "@/icons/clock/paths";
 import clockSpec from "@/icons/clock/animation.spec";
 import { metadata as clockMeta } from "@/icons/clock/metadata";
+import { creatingFilePaths } from "@/icons/creating-file/paths";
+import creatingFileSpec from "@/icons/creating-file/animation.spec";
+import { metadata as creatingFileMeta } from "@/icons/creating-file/metadata";
 import { doorPaths } from "@/icons/door/paths";
 import doorSpec from "@/icons/door/animation.spec";
 import { metadata as doorMeta } from "@/icons/door/metadata";
@@ -65,6 +68,7 @@ export const ICON_SOURCES: Record<string, IconSource> = {
   "card-flip": { paths: cardFlipPaths, spec: cardFlipSpec, metadata: cardFlipMeta },
   "check": { paths: checkPaths, spec: checkSpec, metadata: checkMeta },
   "clock": { paths: clockPaths, spec: clockSpec, metadata: clockMeta },
+  "creating-file": { paths: creatingFilePaths, spec: creatingFileSpec, metadata: creatingFileMeta },
   "door": { paths: doorPaths, spec: doorSpec, metadata: doorMeta },
   "download": { paths: downloadPaths, spec: downloadSpec, metadata: downloadMeta },
   "external-link": { paths: externalLinkPaths, spec: externalLinkSpec, metadata: externalLinkMeta },

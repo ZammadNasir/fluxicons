@@ -6,7 +6,7 @@ export const metadata: IconMetadata = {
   category: "Visibility",
   tags: ["eye", "vision", "view", "watch", "visibility", "blink"],
   featured: false,
-  description: "An eye icon with a natural blinking motion.",
+  description: "An eye icon whose lid lowers halfway.",
   animationDescription:
-    "The eye performs a soft blink while the pupil subtly compresses and returns.",
+    "The upper eyelid lowers over the eye and holds it half-closed while hovered, lifting back up on leave.",
 };

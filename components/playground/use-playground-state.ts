@@ -46,6 +46,11 @@ function defaultTriggerFor(slug: string): AnimationTrigger {
   return getIconMetadata(slug)?.defaultTrigger ?? PLAYGROUND_DEFAULTS.trigger;
 }
 
+/** The icon's authored default `loop` (mirrored from its spec into the registry). */
+function defaultLoopFor(slug: string): boolean {
+  return getIconMetadata(slug)?.defaultLoop ?? PLAYGROUND_DEFAULTS.loop;
+}
+
 /** Parse a state object from URL search params, falling back to defaults. */
 function fromParams(
   params: URLSearchParams,
@@ -69,7 +74,11 @@ function fromParams(
         ? triggerRaw
         : defaultTriggerFor(slug),
     speed: clamp(num("speed", initial.speed), 0.1, 3),
-    loop: params.get("loop") === "true" ? true : initial.loop,
+    // No explicit loop in the URL → adopt the icon's authored default.
+    loop:
+      params.get("loop") === null
+        ? defaultLoopFor(slug)
+        : params.get("loop") === "true",
     delay: clamp(num("delay", initial.delay), 0, 5),
   };
 }
@@ -87,7 +96,10 @@ function toParams(state: PlaygroundState): URLSearchParams {
   if (state.trigger !== defaultTriggerFor(state.slug))
     params.set("trigger", state.trigger);
   if (state.speed !== PLAYGROUND_DEFAULTS.speed) params.set("speed", String(state.speed));
-  if (state.loop !== PLAYGROUND_DEFAULTS.loop) params.set("loop", "true");
+  // Serialize loop only when it differs from the icon's default (both ways),
+  // so default links stay clean and still round-trip.
+  if (state.loop !== defaultLoopFor(state.slug))
+    params.set("loop", String(state.loop));
   if (state.delay !== PLAYGROUND_DEFAULTS.delay) params.set("delay", String(state.delay));
   return params;
 }
@@ -113,8 +125,9 @@ export function usePlaygroundState({
   const searchParams = useSearchParams();
 
   const baseDefaults = { ...PLAYGROUND_DEFAULTS, ...initial };
-  // Unless the caller pinned a trigger, lead with the icon's authored default.
+  // Unless the caller pinned them, lead with the icon's authored defaults.
   if (!initial?.trigger) baseDefaults.trigger = defaultTriggerFor(baseDefaults.slug);
+  if (initial?.loop === undefined) baseDefaults.loop = defaultLoopFor(baseDefaults.slug);
 
   const [state, setState] = useState<PlaygroundState>(() =>
     syncUrl
@@ -142,10 +155,15 @@ export function usePlaygroundState({
     [],
   );
 
-  // Selecting an icon adopts its authored default trigger (e.g. Download →
-  // hoverHold), while keeping the other controls where the user left them.
+  // Selecting an icon adopts its authored default trigger + loop (e.g. Download
+  // → hoverHold), while keeping the other controls where the user left them.
   const selectIcon = useCallback((slug: string) => {
-    setState((prev) => ({ ...prev, slug, trigger: defaultTriggerFor(slug) }));
+    setState((prev) => ({
+      ...prev,
+      slug,
+      trigger: defaultTriggerFor(slug),
+      loop: defaultLoopFor(slug),
+    }));
   }, []);
 
   const reset = useCallback(() => {
@@ -153,6 +171,7 @@ export function usePlaygroundState({
       ...PLAYGROUND_DEFAULTS,
       slug: prev.slug,
       trigger: defaultTriggerFor(prev.slug),
+      loop: defaultLoopFor(prev.slug),
     }));
   }, []);
 

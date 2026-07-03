@@ -1,6 +1,6 @@
 {
   "name": "@zammadnasir/fluxicons",
-  "version": "0.1.0-beta.5",
+  "version": "0.1.0-beta.8",
   "private": false,
   "description": "Animated icons for every framework",
   "main": "dist/index.js",
@@ -32,6 +32,8 @@
     "start": "next start",
     "lint": "eslint",
     "type-check": "tsc --noEmit",
+    "test": "tsx scripts/check-animation-parity.ts",
+    "test:update": "tsx scripts/check-animation-parity.ts --update",
     "create-icon": "tsx scripts/create-icon.ts",
     "prepublishOnly": "npm run build:cli"
   },

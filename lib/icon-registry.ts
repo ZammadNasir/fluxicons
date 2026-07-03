@@ -1,23 +1,12 @@
 import type React from "react";
 
+import type { AnimationTrigger } from "@/lib/animation-spec";
 import { ICON_METADATA, ICON_IMPORTS } from "./icon-manifest.generated";
 
-/**
- * What event starts an icon's animation.
- * - `hover`: plays while the parent is hovered
- * - `hoverHold`: plays on hover and holds the animated peak position; returns to rest on leave
- * - `click`: plays once per click (and via keyboard when focusable)
- * - `inView`: plays once when the icon scrolls into view
- * - `autoplay`: loops continuously
- * - `none`: static, no animation
- */
-export type AnimationTrigger =
-  | "hover"
-  | "hoverHold"
-  | "click"
-  | "inView"
-  | "autoplay"
-  | "none";
+// Re-exported so existing imports from "@/lib/icon-registry" keep working; the
+// type now lives in the framework-agnostic `animation-spec` module so the
+// runtime never reaches the React icon manifest.
+export type { AnimationTrigger };
 
 /** The complete, shared prop contract every FluxIcon implements. */
 export interface IconProps {
@@ -71,6 +60,11 @@ export interface IconMetadata {
    * `scripts/generate-registry.ts` — not authored in `metadata.ts`.
    */
   defaultTrigger?: AnimationTrigger;
+  /**
+   * The icon's default `loop` value, mirrored from its `animation.spec.ts`.
+   * Injected by `scripts/generate-registry.ts` — not authored in `metadata.ts`.
+   */
+  defaultLoop?: boolean;
 }
 
 /**

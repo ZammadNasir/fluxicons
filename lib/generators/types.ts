@@ -77,6 +77,12 @@ export interface GeneratedFile {
   usageSnippet: string;
   /** One-line note about any extra packages the framework needs. */
   dependencies: string;
+  /**
+   * A shared support file the icon imports by relative path (e.g. the animation
+   * runtime as `flux-runtime.ts`). The CLI writes it once into the output dir
+   * alongside the icons, so components stay self-contained with no npm install.
+   */
+  runtime?: { filename: string; code: string };
 }
 
 /**

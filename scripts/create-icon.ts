@@ -166,80 +166,23 @@ const ${camel}Spec: AnimationSpec = {
 export default ${camel}Spec;
 `;
 
+// A fixed thin wrapper: no animation code lives here — it all lives in
+// animation.spec.ts, which FluxIcon compiles and every framework shares.
 const componentSource = `"use client";
 
 import { forwardRef } from "react";
-import { motion, type Variants } from "motion/react";
 import type { IconProps } from "@/lib/icon-registry";
-import { useIconControls } from "@/lib/icons/use-icon-controls";
+import { FluxIcon } from "@/lib/runtime/react/flux-icon";
+import ${camel}Spec from "./animation.spec";
 import { ${camel}Paths } from "./paths";
 
-const EASE: [number, number, number, number] = [0.4, 0, 0.2, 1];
-const ORIGIN = { transformBox: "view-box", transformOrigin: "12px 12px" } as const;
-
-const ${name} = forwardRef<SVGSVGElement, IconProps>(
-  (
-    {
-      size = 24,
-      color = "currentColor",
-      strokeWidth = 1.5,
-      trigger = "hover",
-      speed = 1,
-      loop = false,
-      delay = 0,
-      onAnimationStart,
-      onAnimationComplete,
-      className,
-      style,
-      "aria-label": ariaLabel = "${name} icon",
-    },
-    ref,
-  ) => {
-    const { ref: mergedRef, controls, rootProps } = useIconControls(ref, {
-      trigger,
-      onAnimationStart,
-      onAnimationComplete,
-    });
-
-    // TODO: design this icon's animation. Keep element ids in sync with
-    // animation.spec.ts so the other framework generators stay accurate.
-    const shape: Variants = {
-      normal: { scale: 1 },
-      animate: {
-        scale: [1, 1.12, 1],
-        transition: {
-          duration: 0.5 / speed,
-          ease: EASE,
-          delay,
-          repeat: loop ? Infinity : 0,
-        },
-      },
-    };
-
-    return (
-      <motion.svg
-        ref={mergedRef}
-        width={size}
-        height={size}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke={color}
-        strokeWidth={strokeWidth}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className={className}
-        style={style}
-        aria-label={ariaLabel}
-        focusable={trigger === "click" ? undefined : false}
-        initial="normal"
-        animate={controls}
-        {...rootProps}
-      >
-        <motion.path id="${slug}-shape" d={${camel}Paths.shape.d} variants={shape} style={ORIGIN} />
-      </motion.svg>
-    );
-  },
-);
+/**
+ * ${name} — TODO: one-line description.
+ * Animation: TODO: describe what the animation does.
+ */
+const ${name} = forwardRef<SVGSVGElement, IconProps>((props, ref) => (
+  <FluxIcon ref={ref} name="${name}" paths={${camel}Paths} spec={${camel}Spec} {...props} />
+));
 
 ${name}.displayName = "${name}";
 export default ${name};
@@ -278,7 +221,7 @@ console.log(green(`✓ Created icons/${slug}/metadata.ts`));
 console.log(green(`✓ Created icons/${slug}/index.ts`));
 console.log("\nNext:");
 console.log(`  1. Define real geometry in icons/${slug}/paths.ts`);
-console.log(`  2. Design the animation in icons/${slug}/animation.spec.ts + ${name}.tsx`);
+console.log(`  2. Design the animation in icons/${slug}/animation.spec.ts (the .tsx never changes)`);
 console.log("  3. Run `npm run generate` — the icon is auto-registered for the");
 console.log("     website and the CLI (no manual registry edits needed).");
 console.log(`  4. Generate for any framework: npm run create-icon -- ${name} --framework vue`);

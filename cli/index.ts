@@ -239,6 +239,8 @@ async function add(args: Args): Promise<void> {
 
   let written = 0;
   let depsNote = "";
+  // Shared support files (e.g. flux-runtime.ts) are written once per run.
+  const runtimesWritten = new Set<string>();
 
   for (const name of args.icons) {
     const slug = slugify(name);
@@ -266,6 +268,17 @@ async function add(args: Args): Promise<void> {
     console.log(green(`✓ ${rel(dest)}`) + dim(`  (${generator!.displayName})`));
     written++;
     depsNote = output.dependencies;
+
+    // Drop the co-located runtime the component imports (once, unless it exists).
+    if (output.runtime && !runtimesWritten.has(output.runtime.filename)) {
+      runtimesWritten.add(output.runtime.filename);
+      const runtimeDest = join(process.cwd(), outDir, output.runtime.filename);
+      if (!existsSync(runtimeDest)) {
+        mkdirSync(dirname(runtimeDest), { recursive: true });
+        writeFileSync(runtimeDest, output.runtime.code);
+        console.log(green(`✓ ${rel(runtimeDest)}`) + dim("  (shared runtime)"));
+      }
+    }
   }
 
   if (written > 0) {

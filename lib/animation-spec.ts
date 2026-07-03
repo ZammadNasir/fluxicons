@@ -1,4 +1,19 @@
-import type { AnimationTrigger } from "@/lib/icon-registry";
+/**
+ * What event starts an icon's animation.
+ * - `hover`: plays while the parent is hovered
+ * - `hoverHold`: plays on hover and holds the animated peak position; returns to rest on leave
+ * - `click`: plays once per click (and via keyboard when focusable)
+ * - `inView`: plays once when the icon scrolls into view
+ * - `autoplay`: loops continuously
+ * - `none`: static, no animation
+ */
+export type AnimationTrigger =
+  | "hover"
+  | "hoverHold"
+  | "click"
+  | "inView"
+  | "autoplay"
+  | "none";
 
 /**
  * The framework-agnostic source of truth for an icon's animation.
@@ -84,6 +99,14 @@ export interface AnimationSpec {
 
   /** The icon's default trigger. */
   defaultTrigger: AnimationTrigger;
+
+  /**
+   * Default value of the `loop` prop for this icon. Set `true` for ambient
+   * icons that read better repeating (e.g. an `inView` or `autoplay` pulse), so
+   * they loop in the gallery/playground without the consumer passing `loop`.
+   * A consumer can still override it at runtime.
+   */
+  defaultLoop?: boolean;
 
   /** If true, the continuous sequence loops even after the trigger fires. */
   alwaysLoop?: boolean;

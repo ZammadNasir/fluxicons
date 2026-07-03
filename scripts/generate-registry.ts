@@ -10,7 +10,13 @@
  *   lib/icon-manifest.generated.ts  — metadata + lazy component imports for the
  *                                      website. Pulls in the React components.
  */
-import { existsSync, readdirSync, statSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  readdirSync,
+  readFileSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join, resolve } from "node:path";
 
@@ -86,7 +92,7 @@ function buildManifestFile(slugs: string[]): string {
   const metaEntries = slugs
     .map((slug) => {
       const c = toCamel(slug);
-      return `  "${slug}": { ...${c}Meta, defaultTrigger: ${c}Spec.defaultTrigger },`;
+      return `  "${slug}": { ...${c}Meta, defaultTrigger: ${c}Spec.defaultTrigger, defaultLoop: ${c}Spec.defaultLoop ?? false },`;
     })
     .join("\n");
 
@@ -114,6 +120,17 @@ ${importEntries}
 `;
 }
 
+/**
+ * Embed the framework-agnostic runtime source as a string so the CLI can write
+ * it verbatim next to a user's icons (`flux-runtime.ts`). This keeps generated
+ * components self-contained — no `@zammadnasir/fluxicons` install — while the
+ * runtime stays single-sourced from `lib/runtime/animate-icon.ts`.
+ */
+function buildRuntimeTemplateFile(root: string): string {
+  const src = readFileSync(join(root, "lib", "runtime", "animate-icon.ts"), "utf8");
+  return `${HEADER}export const FLUX_RUNTIME_TS = ${JSON.stringify(src)};\n`;
+}
+
 /** Generate both registry files; returns the discovered slugs. */
 export function generateRegistry(root: string): string[] {
   const iconsDir = join(root, "icons");
@@ -123,6 +140,10 @@ export function generateRegistry(root: string): string[] {
   }
   writeFileSync(join(root, "lib", "icon-sources.generated.ts"), buildSourcesFile(slugs));
   writeFileSync(join(root, "lib", "icon-manifest.generated.ts"), buildManifestFile(slugs));
+  writeFileSync(
+    join(root, "lib", "generators", "runtime-template.generated.ts"),
+    buildRuntimeTemplateFile(root),
+  );
   return slugs;
 }
 

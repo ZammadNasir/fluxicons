@@ -28,13 +28,13 @@ const plan: RuntimePlan = {
   "continuous": false,
   "animations": [
     {
-      "key": "eye-upperLid-translatey",
+      "key": "download-shaft-translatey",
       "active": [
         {
           "transform": "translateY(0px)"
         },
         {
-          "transform": "translateY(7px)"
+          "transform": "translateY(3px)"
         },
         {
           "transform": "translateY(0px)"
@@ -45,10 +45,62 @@ const plan: RuntimePlan = {
           "transform": "translateY(0px)"
         },
         {
-          "transform": "translateY(7px)"
+          "transform": "translateY(3px)"
         }
       ],
-      "duration": 0.4,
+      "duration": 0.55,
+      "delay": 0,
+      "easing": "ease-in-out",
+      "alwaysLoop": false
+    },
+    {
+      "key": "download-arrowhead-translatey",
+      "active": [
+        {
+          "transform": "translateY(0px)"
+        },
+        {
+          "transform": "translateY(3px)"
+        },
+        {
+          "transform": "translateY(0px)"
+        }
+      ],
+      "hold": [
+        {
+          "transform": "translateY(0px)"
+        },
+        {
+          "transform": "translateY(3px)"
+        }
+      ],
+      "duration": 0.55,
+      "delay": 0,
+      "easing": "ease-in-out",
+      "alwaysLoop": false
+    },
+    {
+      "key": "download-tray-scalex",
+      "active": [
+        {
+          "transform": "scaleX(1)"
+        },
+        {
+          "transform": "scaleX(1.08)"
+        },
+        {
+          "transform": "scaleX(1)"
+        }
+      ],
+      "hold": [
+        {
+          "transform": "scaleX(1)"
+        },
+        {
+          "transform": "scaleX(1.08)"
+        }
+      ],
+      "duration": 0.25,
       "delay": 0,
       "easing": "ease-in-out",
       "alwaysLoop": false
@@ -93,12 +145,16 @@ onUnmounted(() => controller?.destroy())
     stroke-linecap="round"
     stroke-linejoin="round"
     role="img"
-    aria-label="Eye icon"
+    aria-label="Download icon"
   >
-      <path id="eye-outline" d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
-      <circle id="eye-pupil" cx="12" cy="12" r="2.5" />
-      <g data-flux="eye-upperLid-translatey" style="transform-box: view-box; transform-origin: 12px 12px">
-        <path id="eye-upperLid" d="M2 12s3.5-7 10-7 10 7 10 7" />
+      <g data-flux="download-shaft-translatey" style="transform-box: view-box; transform-origin: 12px 12px">
+        <path id="download-shaft" d="M12 3v11" />
+      </g>
+      <g data-flux="download-arrowhead-translatey" style="transform-box: view-box; transform-origin: 12px 12px">
+        <path id="download-arrowhead" d="m8 10 4 4 4-4" />
+      </g>
+      <g data-flux="download-tray-scalex" style="transform-box: view-box; transform-origin: 12px 12px">
+        <path id="download-tray" d="M4 19h16" />
       </g>
   </svg>
 </template>
