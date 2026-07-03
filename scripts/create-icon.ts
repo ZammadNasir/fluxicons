@@ -1,10 +1,10 @@
 /**
- * FluxIcons CLI.
+ * Rehover CLI.
  *
  * Scaffold a NEW icon (framework-agnostic source files):
  *   npm run create-icon -- Clock
  *
- * Act as the end-user `npx fluxicons add` command — generate a native
+ * Act as the end-user `npx rehover add` command — generate a native
  * component for a framework from an existing icon's spec:
  *   npm run create-icon -- Bell --framework vue --out components/icons
  */
@@ -167,7 +167,7 @@ export default ${camel}Spec;
 `;
 
 // A fixed thin wrapper: no animation code lives here — it all lives in
-// animation.spec.ts, which FluxIcon compiles and every framework shares.
+// animation.spec.ts, which Rehover compiles and every framework shares.
 const componentSource = `"use client";
 
 import { forwardRef } from "react";

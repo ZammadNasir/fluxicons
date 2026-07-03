@@ -6,7 +6,7 @@ import { getAllIcons } from "@/lib/icon-registry";
 export const metadata: Metadata = {
   title: "Icons",
   description:
-    "Browse the full FluxIcons library of animated icons. Search by name, tag, or category.",
+    "Browse the full Rehover library of animated icons. Search by name, tag, or category.",
 };
 
 export default function IconsPage() {

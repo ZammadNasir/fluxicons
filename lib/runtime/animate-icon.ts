@@ -1,5 +1,5 @@
 /**
- * FluxIcons animation runtime — framework-agnostic, dependency-free, and safe to
+ * Rehover animation runtime — framework-agnostic, dependency-free, and safe to
  * copy into your project. Every generated icon (Vue/Svelte/Angular/Astro) ships
  * its SVG markup with `data-flux` targets plus a compiled `plan`, then calls
  * `animateIcon(root, plan, props)` from here. All trigger behavior lives in this

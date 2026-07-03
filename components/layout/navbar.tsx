@@ -17,7 +17,7 @@ const NAV_LINKS = [
   { href: "/playground", label: "Playground" },
 ] as const;
 
-const GITHUB_URL = "https://github.com/fluxicons/fluxicons";
+const GITHUB_URL = "https://github.com/rehover/icons";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -46,7 +46,7 @@ export function Navbar() {
       )}
     >
       <nav className="mx-auto flex h-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
-        <Link href="/" aria-label="FluxIcons home" className="shrink-0">
+        <Link href="/" aria-label="Rehover home" className="shrink-0">
           <Wordmark />
         </Link>
 
@@ -72,7 +72,7 @@ export function Navbar() {
             href={GITHUB_URL}
             target="_blank"
             rel="noreferrer noopener"
-            aria-label="FluxIcons on GitHub"
+            aria-label="Rehover on GitHub"
             className="hidden h-9 w-9 items-center justify-center rounded-lg border border-border text-foreground-muted transition-colors hover:bg-background-subtle hover:text-foreground sm:inline-flex"
           >
             <GithubMark className="h-4 w-4" />
@@ -125,7 +125,7 @@ export function Navbar() {
                   href={GITHUB_URL}
                   target="_blank"
                   rel="noreferrer noopener"
-                  aria-label="FluxIcons on GitHub"
+                  aria-label="Rehover on GitHub"
                   className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border text-foreground-muted"
                 >
                   <GithubMark className="h-4 w-4" />

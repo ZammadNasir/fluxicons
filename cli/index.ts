@@ -48,8 +48,8 @@ function resolveFramework(input: string): string | undefined {
   return aliases[key];
 }
 
-/** Name of the folder FluxIcons creates inside the project's components dir. */
-const FLUX_ICONS_DIR = "flux-icons";
+/** Name of the folder Rehover creates inside the project's components dir. */
+const FLUX_ICONS_DIR = "rehover";
 
 /**
  * Find the project's existing components directory, checking the conventional
@@ -164,7 +164,7 @@ function parseArgs(argv: string[]): Args {
     else if (a.startsWith("--framework=")) frameworkRaw = a.slice("--framework=".length);
     else if (a === "--out" || a === "-o") args.outDir = argv[++i];
     else if (a.startsWith("--out=")) args.outDir = a.slice("--out=".length);
-    else if (a.startsWith("-")) fail(`Unknown option "${a}". Run \`fluxicons --help\`.`);
+    else if (a.startsWith("-")) fail(`Unknown option "${a}". Run \`rehover --help\`.`);
     else if (!args.command) args.command = a;
     else args.icons.push(a);
   }
@@ -187,10 +187,10 @@ function parseArgs(argv: string[]): Args {
 
 function printHelp(): void {
   console.log(`
-${bold("FluxIcons")} ${dim(`v${VERSION}`)} — animated icons for every framework
+${bold("Rehover")} ${dim(`v${VERSION}`)} — animated icons for every framework
 
 ${bold("Usage")}
-  ${cyan("npx @zammadnasir/fluxicons add <icon...> [options]")}
+  ${cyan("npx @rehover/icons add <icon...> [options]")}
 
 ${bold("Commands")}
   ${cyan("add <icon...>")}   Add one or more icons to your project
@@ -198,15 +198,15 @@ ${bold("Commands")}
 
 ${bold("Options")}
   ${cyan("-f, --framework")}   react | vue ${dim("(prompts if omitted)")}
-  ${cyan("-o, --out")}         Output directory ${dim("(default: <components>/flux-icons, auto-detected)")}
+  ${cyan("-o, --out")}         Output directory ${dim("(default: <components>/rehover, auto-detected)")}
   ${cyan("    --force")}       Overwrite existing files
   ${cyan("-h, --help")}        Show this help
   ${cyan("-v, --version")}     Show the version
 
 ${bold("Examples")}
-  ${dim("$")} npx @zammadnasir/fluxicons add bell
-  ${dim("$")} npx @zammadnasir/fluxicons add clock heart --framework vue
-  ${dim("$")} npx @zammadnasir/fluxicons add download --out src/icons
+  ${dim("$")} npx @rehover/icons add bell
+  ${dim("$")} npx @rehover/icons add clock heart --framework vue
+  ${dim("$")} npx @rehover/icons add download --out src/icons
 `);
 }
 
@@ -217,14 +217,14 @@ function printList(): void {
     const meta = ICON_SOURCES[slug].metadata;
     console.log(`  ${cyan(slug.padEnd(12))} ${dim(meta.description)}`);
   }
-  console.log(`\n${dim("Add one with:")} npx @zammadnasir/fluxicons add ${slugs[0]}\n`);
+  console.log(`\n${dim("Add one with:")} npx @rehover/icons add ${slugs[0]}\n`);
 }
 
 /* --------------------------------- add ------------------------------------ */
 
 async function add(args: Args): Promise<void> {
   if (args.icons.length === 0) {
-    fail("No icon specified. Try `fluxicons add bell` or `fluxicons list`.");
+    fail("No icon specified. Try `rehover add bell` or `rehover list`.");
   }
 
   // Ask for the framework when it wasn't passed via --framework.
@@ -248,7 +248,7 @@ async function add(args: Args): Promise<void> {
     if (!source) {
       console.error(
         red(`✗ Unknown icon "${name}".`) +
-          dim(" Run `fluxicons list` to see what's available."),
+          dim(" Run `rehover list` to see what's available."),
       );
       continue;
     }
@@ -311,7 +311,7 @@ async function main(): Promise<void> {
       printList();
       break;
     default:
-      fail(`Unknown command "${args.command}". Run \`fluxicons --help\`.`);
+      fail(`Unknown command "${args.command}". Run \`rehover --help\`.`);
   }
 }
 

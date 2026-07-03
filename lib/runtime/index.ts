@@ -1,5 +1,5 @@
 /**
- * The framework-agnostic FluxIcons runtime. Every framework wrapper renders its
+ * The framework-agnostic Rehover runtime. Every framework wrapper renders its
  * own SVG markup (with `data-flux` targets) and calls {@link animateIcon} to
  * drive it, so trigger behavior and keyframes are defined exactly once here.
  */

@@ -17,13 +17,13 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
-const SITE_URL = "https://fluxicons.dev";
+const SITE_URL = "https://rehover.dev";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "FluxIcons — Animated icons, built for modern interfaces",
-    template: "%s — FluxIcons",
+    default: "Rehover — Animated icons, built for modern interfaces",
+    template: "%s — Rehover",
   },
   description:
     "Production-ready animated icons with customizable motion and copy-ready components for React, Next.js, and beyond.",
@@ -36,16 +36,16 @@ export const metadata: Metadata = {
     "nextjs",
   ],
   openGraph: {
-    title: "FluxIcons — Animated icons, built for modern interfaces",
+    title: "Rehover — Animated icons, built for modern interfaces",
     description:
       "Production-ready animated icons with customizable motion and copy-ready components.",
     url: SITE_URL,
-    siteName: "FluxIcons",
+    siteName: "Rehover",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "FluxIcons",
+    title: "Rehover",
     description: "Animated icons that feel native to your stack.",
   },
 };

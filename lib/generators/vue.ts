@@ -22,7 +22,7 @@ import { FLUX_RUNTIME_TS } from "./runtime-template.generated";
 const DEFAULT_VUE_IMPORT_PATH = "@/components/icons";
 
 /** The co-located runtime file the emitted SFC imports (written by the CLI). */
-const RUNTIME_FILENAME = "flux-runtime";
+const RUNTIME_FILENAME = "rehover-runtime";
 
 /* -------------------------------------------------------------------------- */
 /* Usage snippet (playground code panel)                                      */
@@ -83,7 +83,7 @@ export const vueUsage: GeneratorInterface = {
   id: "vue",
   label: "Vue 3",
   language: "vue",
-  dependencies: "none — self-contained (drops a local flux-runtime.ts).",
+  dependencies: "none — self-contained (drops a local rehover-runtime.ts).",
   generate: generateVueCode,
 };
 

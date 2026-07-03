@@ -1,8 +1,8 @@
 /**
- * Public, framework-agnostic API for FluxIcons. Lets tools generate native
+ * Public, framework-agnostic API for Rehover. Lets tools generate native
  * icon components programmatically from the declarative animation specs.
  *
- *   import { ICON_GENERATORS, getIconSource } from "@zammadnasir/fluxicons";
+ *   import { ICON_GENERATORS, getIconSource } from "@rehover/icons";
  *
  *   const { spec, paths, metadata } = getIconSource("bell")!;
  *   const file = ICON_GENERATORS.vue.generate(spec, paths, metadata);

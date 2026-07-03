@@ -450,11 +450,11 @@ function compileSpec(spec, paths) {
 }
 
 // lib/generators/runtime-template.generated.ts
-var FLUX_RUNTIME_TS = '/**\n * FluxIcons animation runtime \u2014 framework-agnostic, dependency-free, and safe to\n * copy into your project. Every generated icon (Vue/Svelte/Angular/Astro) ships\n * its SVG markup with `data-flux` targets plus a compiled `plan`, then calls\n * `animateIcon(root, plan, props)` from here. All trigger behavior lives in this\n * one file, so it is identical across frameworks.\n *\n * This file has no imports on purpose: it is emitted verbatim next to your icons\n * (as `flux-runtime.ts`) so nothing has to be installed. Tweak it freely.\n */\n\n/** What event starts an icon\'s animation. */\nexport type AnimationTrigger =\n  | "hover"\n  | "hoverHold"\n  | "click"\n  | "inView"\n  | "autoplay"\n  | "none";\n\n/** One element\'s compiled animation, keyed by its `data-flux` target. */\nexport interface StepAnimation {\n  /** Matches the `data-flux` attribute on the element this animates. */\n  key: string;\n  /** Full keyframes (round-trip or destination) for hover/click/inView/autoplay. */\n  active: Keyframe[];\n  /** Rest \u2192 peak keyframes for `hoverHold` (the return is the reverse of this). */\n  hold: Keyframe[];\n  /** Base duration in seconds (before the `speed` prop divides it). */\n  duration: number;\n  /** Base delay in seconds (before `speed`; the `delay` prop is added at runtime). */\n  delay: number;\n  /** CSS timing-function string. */\n  easing: string;\n  /** Loops regardless of the `loop` prop (continuous/`repeat` steps). */\n  alwaysLoop: boolean;\n}\n\n/** What the runtime needs from a compiled plan. */\nexport interface RuntimePlan {\n  /** Per-element animations. */\n  animations: StepAnimation[];\n  /** Whether the icon autostarts (continuous specs). */\n  continuous: boolean;\n}\n\n/** The runtime-tunable props that map to the icon\'s public API. */\nexport interface IconRuntimeProps {\n  trigger: AnimationTrigger;\n  speed: number;\n  loop: boolean;\n  delay: number;\n}\n\n/** Handle returned by {@link animateIcon} for prop updates and teardown. */\nexport interface IconController {\n  /** Re-wire for new props (e.g. the playground changing `trigger`). */\n  update(props: IconRuntimeProps): void;\n  /** Remove all listeners/observers and cancel running animations. */\n  destroy(): void;\n}\n\ntype Variant = "active" | "hold";\n\ninterface Bound {\n  anim: StepAnimation;\n  el: Element;\n}\n\n/** Attach the animation runtime to an already-rendered icon root. */\nexport function animateIcon(\n  root: SVGSVGElement,\n  plan: RuntimePlan,\n  initialProps: IconRuntimeProps,\n): IconController {\n  let props = initialProps;\n\n  // Resolve each animation\'s DOM target once.\n  const bound: Bound[] = [];\n  for (const anim of plan.animations) {\n    const el = root.querySelector(`[data-flux="${anim.key}"]`);\n    if (el) bound.push({ anim, el });\n  }\n\n  // The currently-playing Animation per target (for restart/reverse).\n  const current = new Map<string, Animation>();\n  const cleanups: Array<() => void> = [];\n  let observer: IntersectionObserver | null = null;\n\n  function makeAnimation(b: Bound, variant: Variant): Animation {\n    const { anim } = b;\n    const keyframes = variant === "hold" ? anim.hold : anim.active;\n    const loops = variant === "active" && (anim.alwaysLoop || props.loop);\n    return b.el.animate(keyframes, {\n      duration: (anim.duration / props.speed) * 1000,\n      delay: ((anim.delay + props.delay) / props.speed) * 1000,\n      easing: anim.easing,\n      fill: "forwards",\n      iterations: loops ? Infinity : 1,\n    });\n  }\n\n  /** (Re)start a variant on every target, cancelling any in-flight run. */\n  function play(variant: Variant): void {\n    for (const b of bound) {\n      current.get(b.anim.key)?.cancel();\n      current.set(b.anim.key, makeAnimation(b, variant));\n    }\n  }\n\n  /** Reverse the held pose back to rest (smooth, from the current position). */\n  function reverseToRest(): void {\n    for (const b of bound) {\n      const running = current.get(b.anim.key);\n      if (running) running.reverse();\n    }\n  }\n\n  function on(type: string, handler: EventListener): void {\n    root.addEventListener(type, handler);\n    cleanups.push(() => root.removeEventListener(type, handler));\n  }\n\n  /** Tear down listeners/observers and stop animations (keeps final pose). */\n  function teardown(): void {\n    for (const c of cleanups) c();\n    cleanups.length = 0;\n    observer?.disconnect();\n    observer = null;\n  }\n\n  function setup(): void {\n    teardown();\n\n    // Accessibility reflects interactivity and stays in sync with `trigger`.\n    if (props.trigger === "click") {\n      root.setAttribute("role", "button");\n      root.setAttribute("tabindex", "0");\n    } else {\n      root.setAttribute("role", "img");\n      root.removeAttribute("tabindex");\n    }\n\n    // Continuous specs and autoplay start immediately.\n    if (plan.continuous || props.trigger === "autoplay") play("active");\n\n    switch (props.trigger) {\n      case "hover":\n        on("mouseenter", () => play("active"));\n        on("focus", () => play("active"));\n        break;\n      case "hoverHold":\n        on("mouseenter", () => play("hold"));\n        on("mouseleave", () => reverseToRest());\n        on("focus", () => play("hold"));\n        on("blur", () => reverseToRest());\n        break;\n      case "click":\n        on("click", () => play("active"));\n        on("keydown", (e) => {\n          const key = (e as KeyboardEvent).key;\n          if (key === "Enter" || key === " ") {\n            e.preventDefault();\n            play("active");\n          }\n        });\n        break;\n      case "inView":\n        observer = new IntersectionObserver(\n          (entries) => {\n            if (entries.some((entry) => entry.isIntersecting)) {\n              play("active");\n              observer?.disconnect();\n              observer = null;\n            }\n          },\n          { threshold: 0.5 },\n        );\n        observer.observe(root);\n        break;\n    }\n  }\n\n  setup();\n\n  return {\n    update(next: IconRuntimeProps) {\n      props = next;\n      // Reset every target to rest before re-wiring for the new props.\n      for (const a of current.values()) a.cancel();\n      current.clear();\n      setup();\n    },\n    destroy() {\n      teardown();\n      for (const a of current.values()) a.cancel();\n      current.clear();\n    },\n  };\n}\n';
+var FLUX_RUNTIME_TS = '/**\n * Rehover animation runtime \u2014 framework-agnostic, dependency-free, and safe to\n * copy into your project. Every generated icon (Vue/Svelte/Angular/Astro) ships\n * its SVG markup with `data-flux` targets plus a compiled `plan`, then calls\n * `animateIcon(root, plan, props)` from here. All trigger behavior lives in this\n * one file, so it is identical across frameworks.\n *\n * This file has no imports on purpose: it is emitted verbatim next to your icons\n * (as `flux-runtime.ts`) so nothing has to be installed. Tweak it freely.\n */\n\n/** What event starts an icon\'s animation. */\nexport type AnimationTrigger =\n  | "hover"\n  | "hoverHold"\n  | "click"\n  | "inView"\n  | "autoplay"\n  | "none";\n\n/** One element\'s compiled animation, keyed by its `data-flux` target. */\nexport interface StepAnimation {\n  /** Matches the `data-flux` attribute on the element this animates. */\n  key: string;\n  /** Full keyframes (round-trip or destination) for hover/click/inView/autoplay. */\n  active: Keyframe[];\n  /** Rest \u2192 peak keyframes for `hoverHold` (the return is the reverse of this). */\n  hold: Keyframe[];\n  /** Base duration in seconds (before the `speed` prop divides it). */\n  duration: number;\n  /** Base delay in seconds (before `speed`; the `delay` prop is added at runtime). */\n  delay: number;\n  /** CSS timing-function string. */\n  easing: string;\n  /** Loops regardless of the `loop` prop (continuous/`repeat` steps). */\n  alwaysLoop: boolean;\n}\n\n/** What the runtime needs from a compiled plan. */\nexport interface RuntimePlan {\n  /** Per-element animations. */\n  animations: StepAnimation[];\n  /** Whether the icon autostarts (continuous specs). */\n  continuous: boolean;\n}\n\n/** The runtime-tunable props that map to the icon\'s public API. */\nexport interface IconRuntimeProps {\n  trigger: AnimationTrigger;\n  speed: number;\n  loop: boolean;\n  delay: number;\n}\n\n/** Handle returned by {@link animateIcon} for prop updates and teardown. */\nexport interface IconController {\n  /** Re-wire for new props (e.g. the playground changing `trigger`). */\n  update(props: IconRuntimeProps): void;\n  /** Remove all listeners/observers and cancel running animations. */\n  destroy(): void;\n}\n\ntype Variant = "active" | "hold";\n\ninterface Bound {\n  anim: StepAnimation;\n  el: Element;\n}\n\n/** Attach the animation runtime to an already-rendered icon root. */\nexport function animateIcon(\n  root: SVGSVGElement,\n  plan: RuntimePlan,\n  initialProps: IconRuntimeProps,\n): IconController {\n  let props = initialProps;\n\n  // Resolve each animation\'s DOM target once.\n  const bound: Bound[] = [];\n  for (const anim of plan.animations) {\n    const el = root.querySelector(`[data-flux="${anim.key}"]`);\n    if (el) bound.push({ anim, el });\n  }\n\n  // The currently-playing Animation per target (for restart/reverse).\n  const current = new Map<string, Animation>();\n  const cleanups: Array<() => void> = [];\n  let observer: IntersectionObserver | null = null;\n\n  function makeAnimation(b: Bound, variant: Variant): Animation {\n    const { anim } = b;\n    const keyframes = variant === "hold" ? anim.hold : anim.active;\n    const loops = variant === "active" && (anim.alwaysLoop || props.loop);\n    return b.el.animate(keyframes, {\n      duration: (anim.duration / props.speed) * 1000,\n      delay: ((anim.delay + props.delay) / props.speed) * 1000,\n      easing: anim.easing,\n      fill: "forwards",\n      iterations: loops ? Infinity : 1,\n    });\n  }\n\n  /** (Re)start a variant on every target, cancelling any in-flight run. */\n  function play(variant: Variant): void {\n    for (const b of bound) {\n      current.get(b.anim.key)?.cancel();\n      current.set(b.anim.key, makeAnimation(b, variant));\n    }\n  }\n\n  /** Reverse the held pose back to rest (smooth, from the current position). */\n  function reverseToRest(): void {\n    for (const b of bound) {\n      const running = current.get(b.anim.key);\n      if (running) running.reverse();\n    }\n  }\n\n  function on(type: string, handler: EventListener): void {\n    root.addEventListener(type, handler);\n    cleanups.push(() => root.removeEventListener(type, handler));\n  }\n\n  /** Tear down listeners/observers and stop animations (keeps final pose). */\n  function teardown(): void {\n    for (const c of cleanups) c();\n    cleanups.length = 0;\n    observer?.disconnect();\n    observer = null;\n  }\n\n  function setup(): void {\n    teardown();\n\n    // Accessibility reflects interactivity and stays in sync with `trigger`.\n    if (props.trigger === "click") {\n      root.setAttribute("role", "button");\n      root.setAttribute("tabindex", "0");\n    } else {\n      root.setAttribute("role", "img");\n      root.removeAttribute("tabindex");\n    }\n\n    // Continuous specs and autoplay start immediately.\n    if (plan.continuous || props.trigger === "autoplay") play("active");\n\n    switch (props.trigger) {\n      case "hover":\n        on("mouseenter", () => play("active"));\n        on("focus", () => play("active"));\n        break;\n      case "hoverHold":\n        on("mouseenter", () => play("hold"));\n        on("mouseleave", () => reverseToRest());\n        on("focus", () => play("hold"));\n        on("blur", () => reverseToRest());\n        break;\n      case "click":\n        on("click", () => play("active"));\n        on("keydown", (e) => {\n          const key = (e as KeyboardEvent).key;\n          if (key === "Enter" || key === " ") {\n            e.preventDefault();\n            play("active");\n          }\n        });\n        break;\n      case "inView":\n        observer = new IntersectionObserver(\n          (entries) => {\n            if (entries.some((entry) => entry.isIntersecting)) {\n              play("active");\n              observer?.disconnect();\n              observer = null;\n            }\n          },\n          { threshold: 0.5 },\n        );\n        observer.observe(root);\n        break;\n    }\n  }\n\n  setup();\n\n  return {\n    update(next: IconRuntimeProps) {\n      props = next;\n      // Reset every target to rest before re-wiring for the new props.\n      for (const a of current.values()) a.cancel();\n      current.clear();\n      setup();\n    },\n    destroy() {\n      teardown();\n      for (const a of current.values()) a.cancel();\n      current.clear();\n    },\n  };\n}\n';
 
 // lib/generators/vue.ts
 var DEFAULT_VUE_IMPORT_PATH = "@/components/icons";
-var RUNTIME_FILENAME = "flux-runtime";
+var RUNTIME_FILENAME = "rehover-runtime";
 function resolveColor2(color) {
   return COLOR_VARIABLE_MAP[color.toLowerCase()] ?? color;
 }
@@ -510,7 +510,7 @@ var vueUsage = {
   id: "vue",
   label: "Vue 3",
   language: "vue",
-  dependencies: "none \u2014 self-contained (drops a local flux-runtime.ts).",
+  dependencies: "none \u2014 self-contained (drops a local rehover-runtime.ts).",
   generate: generateVueCode
 };
 function styleAttr(style) {
@@ -550,7 +550,7 @@ var vueGenerator = {
     const strokeWidth = p.strokeWidth ?? DEFAULT_ICON_PROPS.strokeWidth;
     const trigger = p.trigger ?? spec.defaultTrigger;
     const speed = p.speed ?? DEFAULT_ICON_PROPS.speed;
-    const loop = p.loop ?? DEFAULT_ICON_PROPS.loop;
+    const loop = p.loop ?? spec.defaultLoop ?? DEFAULT_ICON_PROPS.loop;
     const delay = p.delay ?? DEFAULT_ICON_PROPS.delay;
     const runtimeImport = `./${RUNTIME_FILENAME}`;
     const plan = compileSpec(spec, paths);
@@ -958,6 +958,97 @@ var metadata6 = {
   animationDescription: "Both hands sweep a full rotation, the minute hand faster than the hour hand."
 };
 
+// icons/creating-file/paths.ts
+var creatingFilePaths = {
+  file: {
+    type: "path",
+    d: "M8 3h6l5 5v13H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"
+  },
+  fold: {
+    type: "path",
+    d: "M10 11l1-.8 1.2 1.4 1-.9 1.2 1"
+  },
+  lineTop: {
+    type: "path",
+    d: "M10 11l1-.7 1.1 1.2 1-.8 1.2.9H16"
+  },
+  lineMiddle: {
+    type: "path",
+    d: "M10 14l.9-.5 1.2 1.5 1-.9 1.1.6H15"
+  },
+  lineBottom: {
+    type: "path",
+    d: "M10 17l1-.6 1 1 1.1-.7 1.1.8H16"
+  }
+};
+
+// icons/creating-file/animation.spec.ts
+var creatingFileSpec = {
+  elements: {
+    file: {
+      id: "creating-file-file",
+      description: "Document outline"
+    },
+    fold: {
+      id: "creating-file-fold",
+      description: "Folded page corner"
+    },
+    lineTop: {
+      id: "creating-file-lineTop",
+      description: "Top content line"
+    },
+    lineMiddle: {
+      id: "creating-file-lineMiddle",
+      description: "Middle content line"
+    },
+    lineBottom: {
+      id: "creating-file-lineBottom",
+      description: "Bottom content line"
+    }
+  },
+  sequences: {
+    trigger: [
+      {
+        element: "lineTop",
+        property: "opacity",
+        values: [0.3, 1, 0.3],
+        duration: 0.35,
+        ease: "easeInOut"
+      },
+      {
+        element: "lineMiddle",
+        property: "opacity",
+        values: [0.3, 1, 0.3],
+        duration: 0.35,
+        delay: 0.12,
+        ease: "easeInOut"
+      },
+      {
+        element: "lineBottom",
+        property: "opacity",
+        values: [0.3, 1, 0.3],
+        duration: 0.35,
+        delay: 0.24,
+        ease: "easeInOut"
+      }
+    ]
+  },
+  defaultTrigger: "inView",
+  defaultLoop: true
+};
+var animation_spec_default7 = creatingFileSpec;
+
+// icons/creating-file/metadata.ts
+var metadata7 = {
+  name: "CreatingFile",
+  slug: "creating-file",
+  category: "AI",
+  tags: ["file", "document", "create", "writing", "generation", "ai", "text"],
+  featured: false,
+  description: "A document icon with animated content lines representing AI-generated text.",
+  animationDescription: "The document stays still while its text lines softly pulse one after another, suggesting content being generated."
+};
+
 // icons/door/paths.ts
 var doorPaths = {
   frame: {
@@ -1009,10 +1100,10 @@ var doorSpec = {
   defaultTrigger: "hoverHold",
   perspective: 500
 };
-var animation_spec_default7 = doorSpec;
+var animation_spec_default8 = doorSpec;
 
 // icons/door/metadata.ts
-var metadata7 = {
+var metadata8 = {
   name: "Door",
   slug: "door",
   category: "Objects",
@@ -1063,10 +1154,10 @@ var downloadSpec = {
   },
   defaultTrigger: "hoverHold"
 };
-var animation_spec_default8 = downloadSpec;
+var animation_spec_default9 = downloadSpec;
 
 // icons/download/metadata.ts
-var metadata8 = {
+var metadata9 = {
   name: "Download",
   slug: "download",
   category: "Actions",
@@ -1144,10 +1235,10 @@ var externalLinkSpec = {
   },
   defaultTrigger: "hoverHold"
 };
-var animation_spec_default9 = externalLinkSpec;
+var animation_spec_default10 = externalLinkSpec;
 
 // icons/external-link/metadata.ts
-var metadata9 = {
+var metadata10 = {
   name: "ExternalLink",
   slug: "external-link",
   category: "Uncategorized",
@@ -1175,37 +1266,33 @@ var eyeSpec = {
     upperLid: { id: "eye-upperLid", description: "Upper eyelid blink motion" }
   },
   sequences: {
+    // The upper lid lowers down over the eye to roughly the centre and back.
+    // Round-trip values (0 → 7 → 0): `hoverHold` trims the return frame to hold
+    // the lid half-closed (lifting on leave), while `hover`/`click`/`inView`
+    // play the full drop-and-lift as a one-shot half-blink.
     trigger: [
       {
         element: "upperLid",
         property: "translateY",
-        values: [-6, 0, -6],
-        duration: 0.45,
+        values: [0, 7, 0],
+        duration: 0.4,
         ease: "easeInOut"
-      },
-      {
-        element: "pupil",
-        property: "scale",
-        values: [1, 0.88, 1],
-        duration: 0.45,
-        ease: "easeInOut",
-        origin: { x: 12, y: 12 }
       }
     ]
   },
   defaultTrigger: "hoverHold"
 };
-var animation_spec_default10 = eyeSpec;
+var animation_spec_default11 = eyeSpec;
 
 // icons/eye/metadata.ts
-var metadata10 = {
+var metadata11 = {
   name: "Eye",
   slug: "eye",
   category: "Visibility",
   tags: ["eye", "vision", "view", "watch", "visibility", "blink"],
   featured: false,
-  description: "An eye icon with a natural blinking motion.",
-  animationDescription: "The eye performs a soft blink while the pupil subtly compresses and returns."
+  description: "An eye icon whose lid lowers halfway.",
+  animationDescription: "The upper eyelid lowers over the eye and holds it half-closed while hovered, lifting back up on leave."
 };
 
 // icons/heart/paths.ts
@@ -1235,10 +1322,10 @@ var heartSpec = {
   },
   defaultTrigger: "hover"
 };
-var animation_spec_default11 = heartSpec;
+var animation_spec_default12 = heartSpec;
 
 // icons/heart/metadata.ts
-var metadata11 = {
+var metadata12 = {
   name: "Heart",
   slug: "heart",
   category: "Social",
@@ -1286,10 +1373,10 @@ var helpSpec = {
   },
   defaultTrigger: "hover"
 };
-var animation_spec_default12 = helpSpec;
+var animation_spec_default13 = helpSpec;
 
 // icons/help/metadata.ts
-var metadata12 = {
+var metadata13 = {
   name: "Help",
   slug: "help",
   category: "Interface",
@@ -1363,10 +1450,10 @@ var layersSpec = {
   },
   defaultTrigger: "hover"
 };
-var animation_spec_default13 = layersSpec;
+var animation_spec_default14 = layersSpec;
 
 // icons/layers/metadata.ts
-var metadata13 = {
+var metadata14 = {
   name: "Layers",
   slug: "layers",
   category: "Interface",
@@ -1403,10 +1490,10 @@ var refreshSpec = {
   },
   defaultTrigger: "hover"
 };
-var animation_spec_default14 = refreshSpec;
+var animation_spec_default15 = refreshSpec;
 
 // icons/refresh/metadata.ts
-var metadata14 = {
+var metadata15 = {
   name: "Refresh",
   slug: "refresh",
   category: "Interface",
@@ -1462,10 +1549,10 @@ var searchSpec = {
   },
   defaultTrigger: "hover"
 };
-var animation_spec_default15 = searchSpec;
+var animation_spec_default16 = searchSpec;
 
 // icons/search/metadata.ts
-var metadata15 = {
+var metadata16 = {
   name: "Search",
   slug: "search",
   category: "Interface",
@@ -1529,10 +1616,10 @@ var signalSpec = {
   },
   defaultTrigger: "hover"
 };
-var animation_spec_default16 = signalSpec;
+var animation_spec_default17 = signalSpec;
 
 // icons/signal/metadata.ts
-var metadata16 = {
+var metadata17 = {
   name: "Signal",
   slug: "signal",
   category: "Communication",
@@ -1579,10 +1666,10 @@ var userSpec = {
   },
   defaultTrigger: "hover"
 };
-var animation_spec_default17 = userSpec;
+var animation_spec_default18 = userSpec;
 
 // icons/user/metadata.ts
-var metadata17 = {
+var metadata18 = {
   name: "User",
   slug: "user",
   category: "Uncategorized",
@@ -1633,10 +1720,10 @@ var wifiSpec = {
   },
   defaultTrigger: "hover"
 };
-var animation_spec_default18 = wifiSpec;
+var animation_spec_default19 = wifiSpec;
 
 // icons/wifi/metadata.ts
-var metadata18 = {
+var metadata19 = {
   name: "Wifi",
   slug: "wifi",
   category: "Connectivity",
@@ -1654,18 +1741,19 @@ var ICON_SOURCES = {
   "card-flip": { paths: cardFlipPaths, spec: animation_spec_default4, metadata: metadata4 },
   "check": { paths: checkPaths, spec: animation_spec_default5, metadata: metadata5 },
   "clock": { paths: clockPaths, spec: animation_spec_default6, metadata: metadata6 },
-  "door": { paths: doorPaths, spec: animation_spec_default7, metadata: metadata7 },
-  "download": { paths: downloadPaths, spec: animation_spec_default8, metadata: metadata8 },
-  "external-link": { paths: externalLinkPaths, spec: animation_spec_default9, metadata: metadata9 },
-  "eye": { paths: eyePaths, spec: animation_spec_default10, metadata: metadata10 },
-  "heart": { paths: heartPaths, spec: animation_spec_default11, metadata: metadata11 },
-  "help": { paths: helpPaths, spec: animation_spec_default12, metadata: metadata12 },
-  "layers": { paths: layersPaths, spec: animation_spec_default13, metadata: metadata13 },
-  "refresh": { paths: refreshPaths, spec: animation_spec_default14, metadata: metadata14 },
-  "search": { paths: searchPaths, spec: animation_spec_default15, metadata: metadata15 },
-  "signal": { paths: signalPaths, spec: animation_spec_default16, metadata: metadata16 },
-  "user": { paths: userPaths, spec: animation_spec_default17, metadata: metadata17 },
-  "wifi": { paths: wifiPaths, spec: animation_spec_default18, metadata: metadata18 }
+  "creating-file": { paths: creatingFilePaths, spec: animation_spec_default7, metadata: metadata7 },
+  "door": { paths: doorPaths, spec: animation_spec_default8, metadata: metadata8 },
+  "download": { paths: downloadPaths, spec: animation_spec_default9, metadata: metadata9 },
+  "external-link": { paths: externalLinkPaths, spec: animation_spec_default10, metadata: metadata10 },
+  "eye": { paths: eyePaths, spec: animation_spec_default11, metadata: metadata11 },
+  "heart": { paths: heartPaths, spec: animation_spec_default12, metadata: metadata12 },
+  "help": { paths: helpPaths, spec: animation_spec_default13, metadata: metadata13 },
+  "layers": { paths: layersPaths, spec: animation_spec_default14, metadata: metadata14 },
+  "refresh": { paths: refreshPaths, spec: animation_spec_default15, metadata: metadata15 },
+  "search": { paths: searchPaths, spec: animation_spec_default16, metadata: metadata16 },
+  "signal": { paths: signalPaths, spec: animation_spec_default17, metadata: metadata17 },
+  "user": { paths: userPaths, spec: animation_spec_default18, metadata: metadata18 },
+  "wifi": { paths: wifiPaths, spec: animation_spec_default19, metadata: metadata19 }
 };
 
 // lib/icon-sources.ts

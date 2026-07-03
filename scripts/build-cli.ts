@@ -1,5 +1,5 @@
 /**
- * Bundles the FluxIcons CLI and public API into self-contained CommonJS files
+ * Bundles the Rehover CLI and public API into self-contained CommonJS files
  * under dist/. Everything (generators, icon specs, path data) is inlined so the
  * published binary runs in any project with plain Node — no `@/` path-alias or
  * React runtime is needed.

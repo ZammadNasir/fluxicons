@@ -13,7 +13,7 @@ type Line =
   | { kind: "gap" };
 
 const TERMINAL_LINES: Line[] = [
-  { kind: "cmd", text: "npx fluxicons add bell" },
+  { kind: "cmd", text: "npx rehover add bell" },
   { kind: "prompt", text: "Which framework?" },
   { kind: "option", text: "React / Next.js", selected: true },
   { kind: "option", text: "Vue 3" },
@@ -23,7 +23,7 @@ const TERMINAL_LINES: Line[] = [
   { kind: "check", text: "Written to components/icons/Bell.tsx" },
   { kind: "check", text: "Done." },
   { kind: "gap" },
-  { kind: "cmd", text: "npx fluxicons add clock --framework vue" },
+  { kind: "cmd", text: "npx rehover add clock --framework vue" },
   { kind: "check", text: "Generating Clock.vue for Vue..." },
   { kind: "check", text: "Written to components/icons/Clock.vue" },
   { kind: "check", text: "Done." },
@@ -222,7 +222,7 @@ export function CliSection() {
             One icon. Every framework.
           </h2>
           <p className="mt-4 max-w-md text-base text-foreground-muted">
-            FluxIcons generates native components for your stack. React gets
+            Rehover generates native components for your stack. React gets
             Framer Motion. Vue gets CSS animations. Same animation, native to
             every platform.
           </p>

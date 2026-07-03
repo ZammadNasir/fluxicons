@@ -1,11 +1,11 @@
 {
-  "name": "@zammadnasir/fluxicons",
+  "name": "@rehover/icons",
   "version": "0.1.0-beta.8",
   "private": false,
   "description": "Animated icons for every framework",
   "main": "dist/index.js",
   "bin": {
-    "fluxicons": "dist/cli/index.js"
+    "rehover": "dist/cli/index.js"
   },
   "files": [
     "dist"
@@ -20,7 +20,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ZammadNasir/fluxicons.git"
+    "url": "git+https://github.com/rehover/icons.git"
   },
   "scripts": {
     "generate": "tsx scripts/generate-registry.ts",

@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 export const metadata: Metadata = {
   title: "Documentation",
   description:
-    "Install, customize, and ship FluxIcons. Learn the props, animation triggers, CLI workflow, and theming.",
+    "Install, customize, and ship Rehover. Learn the props, animation triggers, CLI workflow, and theming.",
 };
 
 const PROPS: { name: string; type: string; def: string; desc: string }[] = [
@@ -59,7 +59,7 @@ export default function DocsPage() {
           Documentation
         </Badge>
         <h1 className="tracking-display text-4xl font-semibold text-foreground">
-          Get started with FluxIcons
+          Get started with Rehover
         </h1>
         <p className="mt-3 text-base text-foreground-muted">
           Animated icons that feel native to your stack. Copy the code, or add
@@ -70,10 +70,10 @@ export default function DocsPage() {
       <div className="space-y-14">
         <Section id="install" title="Installation">
           <p>
-            FluxIcons is CLI-first: icons are copied into your project as source
+            Rehover is CLI-first: icons are copied into your project as source
             files. Add one with a single command.
           </p>
-          <CodeBlock language="bash" code={`npx fluxicons add clock`} />
+          <CodeBlock language="bash" code={`npx rehover add clock`} />
           <p>
             This writes <code className="font-mono text-foreground">Clock.tsx</code>{" "}
             into <code className="font-mono text-foreground">components/icons/</code>.
@@ -88,7 +88,7 @@ export default function DocsPage() {
           </p>
           <CodeBlock
             language="bash"
-            code={`npx fluxicons add clock --framework vue`}
+            code={`npx rehover add clock --framework vue`}
           />
         </Section>
 

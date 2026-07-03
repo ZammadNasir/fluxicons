@@ -123,7 +123,7 @@ ${importEntries}
 /**
  * Embed the framework-agnostic runtime source as a string so the CLI can write
  * it verbatim next to a user's icons (`flux-runtime.ts`). This keeps generated
- * components self-contained — no `@zammadnasir/fluxicons` install — while the
+ * components self-contained — no `@rehover/icons` install — while the
  * runtime stays single-sourced from `lib/runtime/animate-icon.ts`.
  */
 function buildRuntimeTemplateFile(root: string): string {

@@ -1,4 +1,4 @@
-You are generating one icon for "FluxIcons", a framework-agnostic animated icon library. Each icon is a folder with 4 files. Study the example below (icon: Bell) and produce the SAME 4 files for the NEW icon, matching every convention exactly (naming, types, style, structure).
+You are generating one icon for "Rehover", a framework-agnostic animated icon library. Each icon is a folder with 4 files. Study the example below (icon: Bell) and produce the SAME 4 files for the NEW icon, matching every convention exactly (naming, types, style, structure).
 
 The real work is three files — `paths.ts` (geometry), `animation.spec.ts` (the animation, and the single source of truth for every framework), and `metadata.ts`. The `<Name>.tsx` is a fixed boilerplate wrapper with zero animation code. Do NOT put animation logic in the component; it all lives in the spec.
 
@@ -97,7 +97,7 @@ export const metadata: IconMetadata = {
 
 ## Triggers — how they work, and why they must work in EVERY framework
 
-Every FluxIcon exposes a runtime `trigger` prop. `defaultTrigger` in the spec only picks the default — the icon must support ALL triggers, because a consumer can override `trigger` at runtime:
+Every Rehover icon exposes a runtime `trigger` prop. `defaultTrigger` in the spec only picks the default — the icon must support ALL triggers, because a consumer can override `trigger` at runtime:
 
 - `hover` — on pointer enter, play the full animation once, then settle back to rest. A one-shot; re-entering replays it.
 - `hoverHold` — on pointer enter, animate to the PEAK and HOLD there for as long as the pointer stays; on leave, animate back to rest. (Press-and-hold feel — NOT the same as `hover`.)
@@ -106,7 +106,7 @@ Every FluxIcon exposes a runtime `trigger` prop. `defaultTrigger` in the spec on
 - `autoplay` — play on mount. Loops when the spec is continuous or `loop` is set.
 - `none` — never animates.
 
-**FluxIcons is framework-agnostic, and `animation.spec.ts` is the single source of truth.** You never hand-write animation code. A shared compiler turns the spec into keyframes, and a shared runtime plays them; React (`FluxIcon`), Vue, and every future framework all consume that one compiler, so they animate identically. Every trigger's behavior — including `hoverHold` — is derived automatically from the spec's `values`. So you must author the spec so it is correct for ALL triggers, not just `hover`:
+**Rehover is framework-agnostic, and `animation.spec.ts` is the single source of truth.** You never hand-write animation code. A shared compiler turns the spec into keyframes, and a shared runtime plays them; React (`FluxIcon`), Vue, and every future framework all consume that one compiler, so they animate identically. Every trigger's behavior — including `hoverHold` — is derived automatically from the spec's `values`. So you must author the spec so it is correct for ALL triggers, not just `hover`:
 
 - A `values` array takes one of two shapes, and the generators derive `hoverHold` from whichever you use:
   - **Round-trip** (the common, versatile shape): `values` start and end at the resting value, e.g. `[0, -12, 12, -9, 9, -5, 0]` or Download's `[0, 3, 0]`. Generators detect `values[0] === values[last]`, drop the trailing rest frame to build the `hoverHold` held pose (`[0, -12, 12, -9, 9, -5]` / `[0, 3]`), and reverse it for the return on leave. This shape works for BOTH triggers — `hover` plays the full round-trip, `hoverHold` holds the trimmed peak — so it's the default choice (Download is a round-trip that defaults to `hoverHold`).

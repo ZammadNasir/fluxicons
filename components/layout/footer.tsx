@@ -5,7 +5,7 @@ const LINKS = [
   { href: "/icons", label: "Icons" },
   { href: "/playground", label: "Playground" },
   { href: "/docs", label: "Docs" },
-  { href: "https://github.com/fluxicons/fluxicons", label: "GitHub", external: true },
+  { href: "https://github.com/rehover/icons", label: "GitHub", external: true },
 ] as const;
 
 export function Footer() {
@@ -49,7 +49,7 @@ export function Footer() {
       <div className="border-t border-border">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
           <p className="text-xs text-foreground-subtle">
-            © {new Date().getFullYear()} FluxIcons. Open source, free to use.
+            © {new Date().getFullYear()} Rehover. Open source, free to use.
           </p>
         </div>
       </div>

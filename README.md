@@ -1,4 +1,4 @@
-# FluxIcons 🚧
+# Rehover 🚧
 
 > This package is in early development. Not ready for production use.
 

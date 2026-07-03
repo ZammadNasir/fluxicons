@@ -48,7 +48,7 @@ interface UseIconControls {
 }
 
 /**
- * Shared trigger + accessibility plumbing for every FluxIcon.
+ * Shared trigger + accessibility plumbing for every Rehover icon.
  *
  * This intentionally contains NO animation definitions — each icon owns its
  * own variants (`normal`/`animate`/`hold`) and timing. This hook only decides

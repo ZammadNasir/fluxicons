@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /*
- * FluxIcons design token system.
+ * Rehover design token system.
  * Raw HSL channel values live on :root / .dark as plain CSS variables.
  * They are mapped into Tailwind color utilities via @theme inline below,
  * so e.g. `bg-background`, `text-foreground-muted`, `border-border` work.

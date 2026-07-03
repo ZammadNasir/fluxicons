@@ -5,7 +5,7 @@ import { Playground } from "@/components/playground/playground";
 export const metadata: Metadata = {
   title: "Playground",
   description:
-    "Customize any FluxIcon — size, color, stroke, speed, and trigger — then copy the exact code. Shareable via URL.",
+    "Customize any Rehover icon — size, color, stroke, speed, and trigger — then copy the exact code. Shareable via URL.",
 };
 
 function PlaygroundFallback() {

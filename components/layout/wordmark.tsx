@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 /**
- * FluxIcons wordmark: a geometric monogram mark (a stylized motion glyph)
+ * Rehover wordmark: a geometric monogram mark (a stylized motion glyph)
  * paired with the product name. Used in the navbar and footer.
  */
 export function Wordmark({
@@ -36,7 +36,7 @@ export function Wordmark({
       </span>
       {showText && (
         <span className="text-[15px] font-semibold tracking-tight text-foreground">
-          FluxIcons
+          Rehover
         </span>
       )}
     </span>

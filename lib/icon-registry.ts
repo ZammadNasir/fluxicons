@@ -8,7 +8,7 @@ import { ICON_METADATA, ICON_IMPORTS } from "./icon-manifest.generated";
 // runtime never reaches the React icon manifest.
 export type { AnimationTrigger };
 
-/** The complete, shared prop contract every FluxIcon implements. */
+/** The complete, shared prop contract every Rehover icon implements. */
 export interface IconProps {
   // Visual
   /** Pixel size of the square icon. Default: 24. */
